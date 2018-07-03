@@ -45,7 +45,7 @@ class Reward(db.Model):
 class PointsPrograms(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     reward_id = db.Column(db.Integer, db.ForeignKey('reward.id'))
-    name = db.Column(db.VARCHAR)
+    name = db.Column(db.VARCHAR(256))
     value = db.Column(db.Float)
 
 class UserRewardLookup(db.Model):
