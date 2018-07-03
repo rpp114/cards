@@ -33,7 +33,7 @@ class Reward(db.Model):
     card_id = db.Column(db.Integer, db.ForeignKey('card.id'))
     name = db.Column(db.VARCHAR(256), unique=True)
     days_for_spend = db.Column(db.Integer)
-    minimum_spend = db>Column(db.Integer)
+    minimum_spend = db.Column(db.Integer)
     annual_fee = db.Column(db.Integer)
     bonus_points = db.Column(db.Integer)
     from_date = db.Column(db.DATETIME)
@@ -46,7 +46,7 @@ class PointsPrograms(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     reward_id = db.Column(db.Integer, db.ForeignKey('reward.id'))
     name = db.Column(db.VARCHAR)
-    value = db.Column(db.Decimal(10,2))
+    value = db.Column(db.Float)
 
 class UserRewardLookup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
