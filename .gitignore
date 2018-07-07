@@ -3,3 +3,4 @@ secret_info.py
 *.pyc
 run.py
 travel
+data_uploader.py

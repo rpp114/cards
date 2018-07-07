@@ -31,29 +31,29 @@ class Card(db.Model):
 class Reward(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     card_id = db.Column(db.Integer, db.ForeignKey('card.id'))
-    name = db.Column(db.VARCHAR(256), unique=True)
+    points_program_id = db.Column(db.Integer, db.ForeignKey('points_program.id'))
     days_for_spend = db.Column(db.Integer)
     minimum_spend = db.Column(db.Integer)
     annual_fee = db.Column(db.Integer)
+    annual_fee_waived = db.Column(db.VARCHAR(10))
     bonus_points = db.Column(db.Integer)
     from_date = db.Column(db.DATETIME)
     to_date = db.Column(db.DATETIME)
     status = db.Column(db.VARCHAR(50))
-    points_program = db.relationship('PointsProgram', backref='reward', uselist=False)
     users = db.relationship('User', secondary='user_reward_lookup')
 
-class PointsPrograms(db.Model):
+class PointsProgram(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    reward_id = db.Column(db.Integer, db.ForeignKey('reward.id'))
-    name = db.Column(db.VARCHAR(256))
+    name = db.Column(db.VARCHAR(256), unique=True)
     value = db.Column(db.Float)
+    rewards = db.relationship('Reward', backref='points_program')
 
 class UserRewardLookup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    reward_id = db.Column(db.Integer, db.ForeignKey('card.id'))
+    reward_id = db.Column(db.Integer, db.ForeignKey('reward.id'))
     rewards = db.relationship('Reward', backref=db.backref('user_rewards', cascade='all, delete-orphan'))
-    users = db.relationship('Card', backref=db.backref('user_rewards', cascade='all, delete-orphan'))
+    users = db.relationship('User', backref=db.backref('user_rewards', cascade='all, delete-orphan'))
     active_date = db.Column(db.DATETIME)
     cancel_date = db.Column(db.DATETIME)
     status = db.Column(db.VARCHAR(256))
