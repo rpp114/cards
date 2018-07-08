@@ -1,0 +1,13 @@
+{% extends "internal_base.html" %}
+
+{% block content %}
+  <h1>Here's your first Card:</h1>
+  <h2>{{suggested_card.card.company.name}} - {{suggested_card.card.name}}</h2>
+  <h3>Here's all the other ones you could get</h3>
+  {% for company in companies %}
+    <h4> {{company.name}}</h4>
+      {% for card in company.cards %}
+        <h6><a href="{{ url_for('card_profile', card_id=card.id) }}">{{card.name}}</a></h6>
+      {% endfor %}
+  {% endfor %}
+{% endblock %}

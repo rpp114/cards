@@ -1,0 +1,12 @@
+{% extends "internal_base.html" %}
+
+{% block content %}
+  <h1>This is the Card Profile Page</h1>
+  <h4>{{reward.card.name}}</h4>
+  <p>Card Type: {{reward.card.card_type}}</p>
+  <p>Points Program: {{reward.points_program.name}}</p>
+  <p>Points: {{reward.bonus_points}}</p>
+  <p>Point Value: {{reward.points_program.value}}</p>
+  <p>Min Spend: {{reward.minimum_spend}}</p>
+  <p>Days to Min Spend: {{reward.days_for_spend}}</p>
+{% endblock %}

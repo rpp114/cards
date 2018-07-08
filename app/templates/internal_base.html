@@ -1,0 +1,24 @@
+<html>
+    <head>
+      <title>Welcome to Travel Hacking</title>
+    </head>
+    <body>
+        <div>
+            Travel Credit Cards:
+            <a href="{{ url_for('user_cards') }}">Home</a>
+            <a href="{{ url_for('wallet') }}">Wallet</a>
+            <a href="{{ url_for('index') }}">Index</a></a>
+        </div>
+        <hr>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </body>
+</html>
