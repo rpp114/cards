@@ -1,6 +1,7 @@
 from flask import render_template, flash, url_for, redirect, request
 from app import app, db, models
 from app.forms import LoginForm, CardProfileForm
+from flask_login import current_user, login_user, login_required
 
 @app.route('/')
 @app.route('/index')
@@ -26,10 +27,23 @@ def how_it_works():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+	if current_user.is_authenticated:
+		return redirct(url_for('index'))
+
 	form = LoginForm()
 
 	if form.validate_on_submit():
-		flash('Login user {}, remember me {}'.format(form.username.data, form.remember_me.data))
+		user = models.User.query.filter_by(username = form.username.data).first()
+
+		print(user, form.password.data)
+
+		if user is None or not user.check_password(form.password.data):
+			flash('bad login')
+			return redirect(url_for('login'))
+
+		login_user(user, remember = form.remember_me.data)
+
+		flash('Logged in user: {}'.format(current_user.username))
 		return redirect(url_for('user_cards'))
 
 	return render_template('login.html', title='Sign In', form=form)
