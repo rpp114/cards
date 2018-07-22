@@ -1,6 +1,10 @@
-from app import db, login
+from app import db, login, app
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from itsdangerous import URLSafeSerializer
+
+login_serializer = URLSafeSerializer(app.config['SECRET_KEY'])
+
 
 @login.user_loader
 def load_user(session_token):
@@ -23,7 +27,7 @@ class User(UserMixin, db.Model):
         return str(self.session_token)
 
     def set_session_token(self):
-        self.session_token = generate_password_hash(self.username, self.password, self.status)
+        self.session_token = login_serializer.dumps([self.username,self.password,self.status])
 
     def set_password(self, password):
         self.password = generate_password_hash(password)

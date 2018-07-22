@@ -4,11 +4,9 @@
     </head>
     <body>
         <div>
-            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('index') }}">Home</a>  |  
+            <a href="{{ url_for('how_it_works') }}">How It Works</a>  |
             <a href="{{ url_for('login') }}">Login</a>
-            <a href="{{ url_for('how_it_works') }}">How It Works</a>
-            <a href="{{ url_for('wallet') }}">Wallet</a>
-            <a href="{{ url_for('user_cards') }}">Profile</a>
         </div>
         <hr>
         {% with messages = get_flashed_messages() %}

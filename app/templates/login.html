@@ -15,4 +15,7 @@
       <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
       <p>{{ form.submit() }}</p>
   </form>
+  <p>
+    Not a Member? <a href="{{ url_for('signup') }}">Sign Up Here</a>
+  </p>
 {% endblock %}

@@ -1,11 +1,14 @@
 from flask import render_template, flash, url_for, redirect, request
 from app import app, db, models
-from app.forms import LoginForm, CardProfileForm
-from flask_login import current_user, login_user, login_required
+from app.forms import LoginForm, CardProfileForm, SignupForm
+from flask_login import current_user, login_user, login_required, logout_user
 
 @app.route('/')
 @app.route('/index')
 def index():
+	if current_user.is_authenticated:
+		return redirect(url_for('user_cards'))
+
 	title = 'Travel Hacker'
 
 	user = {'username': 'Ray'}
@@ -24,18 +27,42 @@ def how_it_works():
 
 	return render_template('how_it_works.html')
 
+@app.route('/logout')
+def logout():
+	logout_user()
+	return redirect(url_for('index'))
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+	if current_user.is_authenticated:
+		return redirect(url_for('user_cards'))
+
+	form = SignupForm()
+
+	if form.validate_on_submit():
+		user = models.User(username=form.username.data, email=form.email.data, status='active')
+		user.set_password(form.password.data)
+		user.set_session_token()
+
+		db.session.add(user)
+		db.session.commit()
+
+		login_user(user, remember=form.remember_me.data)
+
+		return redirect(url_for('user_cards'))
+
+	return render_template('signup.html', form=form)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 	if current_user.is_authenticated:
-		return redirct(url_for('index'))
+		return redirect(url_for('user_cards'))
 
 	form = LoginForm()
 
 	if form.validate_on_submit():
 		user = models.User.query.filter_by(username = form.username.data).first()
-
-		print(user, form.password.data)
 
 		if user is None or not user.check_password(form.password.data):
 			flash('bad login')
@@ -49,20 +76,24 @@ def login():
 	return render_template('login.html', title='Sign In', form=form)
 
 @app.route('/user/wallet')
+@login_required
 def wallet():
 
 	return render_template('wallet.html')
 
 @app.route('/user/cards')
+@login_required
 def user_cards():
 
 	companies = models.Company.query.order_by(models.Company.name).all()
 
+	# Needs Algo to Suggest Card
 	suggested_card = models.Reward.query.filter_by(card_id=304).first()
 
 	return render_template('user_cards.html', companies=companies, suggested_card = suggested_card)
 
 @app.route('/card')
+@login_required
 def card_profile():
 	card_id = request.args.get('card_id')
 
