@@ -48,6 +48,7 @@ class Card(db.Model):
     apply_link_url = db.Column(db.TEXT)
     image_link_url = db.Column(db.TEXT)
     rewards = db.relationship('Reward', backref='card', lazy='dynamic')
+    categories = db.relationship('SpendingCategory', backref='card', secondary='card_category_lookup')
 
 class Reward(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -72,13 +73,14 @@ class PointsProgram(db.Model):
 class SpendingCategory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.VARCHAR(255))
+    cards = db.relationship('Card', backref = 'category', secondary='card_category_lookup')
 
 class CardCategoryLookup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     card_id = db.Column(db.Integer, db.ForeignKey('card.id'))
     category_id = db.Column(db.Integer, db.ForeignKey('spending_category.id'))
     cards = db.relationship('Card', backref=db.backref('card_categories', cascade='all, delete-orphan'))
-    categories = db.relationship('SpendingCategory', backref=db.backref('card_categories', cascade='all, delete-orphan'))
+    categories = db.relationship('SpendingCategory', backref=db.backref('category_cards', cascade='all, delete-orphan'))
     company_name = db.Column(db.VARCHAR(255))
     earning_percent = db.Column(db.Float)
 

@@ -3,7 +3,7 @@
 {% block content %}
   <h1>This is your wallet</h1>
   {% for reward in user.rewards %}
-    <h5>{{reward.card.company.name}} - {{reward.card.name}}</h5>
+    <h5><a href="{{ url_for('card_profile', card_id=reward.card.id) }}">{{reward.card.company.name}} - {{reward.card.name}}</a></h5>
   {% endfor %}
 
 {% endblock %}

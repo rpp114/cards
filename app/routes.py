@@ -98,10 +98,12 @@ def user_cards():
 
 	companies = models.Company.query.order_by(models.Company.name).all()
 
+	user_cards = [reward.card for reward in current_user.rewards]
+
 	# Needs Algo to Suggest Card
 	suggested_card = models.Reward.query.filter_by(card_id=304).first()
 
-	return render_template('user_cards.html', companies=companies, suggested_card = suggested_card)
+	return render_template('user_cards.html', companies=companies, suggested_card = suggested_card, user_cards = user_cards)
 
 @app.route('/card')
 @login_required
@@ -110,6 +112,11 @@ def card_profile():
 
 	card = models.Card.query.get(card_id)
 
+	spending_categories = []
+
+	for i in range(len(card.categories)):
+		spending_categories.append((card.categories[i].name, card.card_categories[0].earning_percent))
+
 	reward = card.rewards.filter_by(status='active').first()
 
-	return render_template('card_page.html', reward=reward)
+	return render_template('card_page.html', reward=reward, spending_categories = spending_categories)
