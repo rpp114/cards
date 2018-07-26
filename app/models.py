@@ -69,6 +69,19 @@ class PointsProgram(db.Model):
     value = db.Column(db.Float)
     rewards = db.relationship('Reward', backref='points_program')
 
+class SpendingCategory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.VARCHAR(255))
+
+class CardCategoryLookup(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    card_id = db.Column(db.Integer, db.ForeignKey('card.id'))
+    category_id = db.Column(db.Integer, db.ForeignKey('spending_category.id'))
+    cards = db.relationship('Card', backref=db.backref('card_categories', cascade='all, delete-orphan'))
+    categories = db.relationship('SpendingCategory', backref=db.backref('card_categories', cascade='all, delete-orphan'))
+    company_name = db.Column(db.VARCHAR(255))
+    earning_percent = db.Column(db.Float)
+
 class UserRewardLookup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))

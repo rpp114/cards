@@ -2,4 +2,8 @@
 
 {% block content %}
   <h1>This is your wallet</h1>
+  {% for reward in user.rewards %}
+    <h5>{{reward.card.company.name}} - {{reward.card.name}}</h5>
+  {% endfor %}
+
 {% endblock %}

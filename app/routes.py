@@ -2,6 +2,7 @@ from flask import render_template, flash, url_for, redirect, request
 from app import app, db, models
 from app.forms import LoginForm, CardProfileForm, SignupForm
 from flask_login import current_user, login_user, login_required, logout_user
+import datetime
 
 @app.route('/')
 @app.route('/index')
@@ -79,11 +80,21 @@ def login():
 @login_required
 def wallet():
 
-	return render_template('wallet.html')
+	return render_template('wallet.html',user=current_user)
 
-@app.route('/user/cards')
+@app.route('/user/cards', methods=['GET', 'POST'])
 @login_required
 def user_cards():
+
+	if request.method == 'POST':
+		curr_time = datetime.datetime.now()
+		reward = models.Reward.query.filter(models.Reward.card.has(id=request.form.get('card_id')),models.Reward.from_date <= curr_time, models.Reward.to_date >= curr_time, models.Reward.status == 'active').first()
+
+		user = current_user
+		user.rewards.append(reward)
+		db.session.add(user)
+		db.session.commit()
+		flash('Added {} to your wallet'.format(reward.card.name))
 
 	companies = models.Company.query.order_by(models.Company.name).all()
 
