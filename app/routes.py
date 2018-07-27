@@ -12,15 +12,6 @@ def index():
 
 	title = 'Travel Hacker'
 
-	user = {'username': 'Ray'}
-
-	posts = [
-	{'author': {'username': 'Sarah'},
-	 'body': 'Nice day huh?'},
-	{'author': {'username': 'Ted'},
-	 'body': 'Sure is'}
-	]
-
 	return render_template('index.html', title=title, user=user, posts=posts)
 
 @app.route('/how_it_works')
@@ -81,6 +72,12 @@ def login():
 def wallet():
 
 	return render_template('wallet.html',user=current_user)
+
+@app.route('/user/profile')
+@login_required
+def user_profile():
+
+	return render_template('user_profile.html')
 
 @app.route('/user/cards', methods=['GET', 'POST'])
 @login_required
