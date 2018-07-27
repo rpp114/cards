@@ -5,10 +5,10 @@ from itsdangerous import URLSafeSerializer
 
 login_serializer = URLSafeSerializer(app.config['SECRET_KEY'])
 
-
 @login.user_loader
 def load_user(session_token):
     return User.query.filter_by(session_token=session_token).first()
+
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -16,9 +16,9 @@ class User(UserMixin, db.Model):
     email = db.Column(db.VARCHAR(256), index=True, unique=True)
     password = db.Column(db.VARCHAR(256))
     session_token = db.Column(db.VARCHAR(256))
-    status = db.Column(db.VARCHAR(15))
+    status = db.Column(db.VARCHAR(15), default='active')
     first_login = db.Column(db.SMALLINT())
-    rewards = db.relationship('Reward', secondary='user_reward_lookup')
+    cards = db.relationship('Card', secondary='user_card_lookup')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -35,6 +35,10 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
+####################################################
+#  Card and Company Definitions -- User Join to Cards
+####################################################
+
 class Company(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.VARCHAR(256), unique=True)
@@ -42,54 +46,77 @@ class Company(db.Model):
 
 class Card(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    points_program_id = db.Column(db.Integer, db.ForeignKey('points_program.id'))
     company_id = db.Column(db.Integer, db.ForeignKey('company.id'))
-    name = db.Column(db.VARCHAR(256), unique=True)
+    name = db.Column(db.VARCHAR(256))
     card_type = db.Column(db.VARCHAR(15))
     apply_link_url = db.Column(db.TEXT)
     image_link_url = db.Column(db.TEXT)
-    rewards = db.relationship('Reward', backref='card', lazy='dynamic')
-    categories = db.relationship('SpendingCategory', backref='card', secondary='card_category_lookup')
+    users = db.relationship('User', backref='card', secondary='user_card_lookup')
+    signup_bonuses = db.relationship('SignupBonus', backref='card', lazy='dynamic')
+    spending_categories = db.relationship('SpendingCategory', backref='card', secondary='spending_category_lookup')
+    reward_categories = db.relationship('RewardCategory', backref='card', secondary='reward_category_lookup')
 
-class Reward(db.Model):
+class UserCardLookup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     card_id = db.Column(db.Integer, db.ForeignKey('card.id'))
-    points_program_id = db.Column(db.Integer, db.ForeignKey('points_program.id'))
-    days_for_spend = db.Column(db.Integer)
-    minimum_spend = db.Column(db.Integer)
-    annual_fee = db.Column(db.Integer)
-    annual_fee_waived = db.Column(db.VARCHAR(10))
-    bonus_points = db.Column(db.Integer)
-    from_date = db.Column(db.DATETIME)
-    to_date = db.Column(db.DATETIME)
-    status = db.Column(db.VARCHAR(50))
-    users = db.relationship('User', secondary='user_reward_lookup')
+    active_date = db.Column(db.DATETIME)
+    cancel_date = db.Column(db.DATETIME)
+    status = db.Column(db.VARCHAR(15), default='active')
+    user_cards = db.relationship('Card', backref=db.backref('user_cards', cascade='all, delete-orphan'))
+    card_users = db.relationship('User', backref=db.backref('card_users', cascade='all, delete-orphan'))
+
+####################################################
+#  Points Programs and Sign Up Bonuses
+####################################################
 
 class PointsProgram(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.VARCHAR(256), unique=True)
     value = db.Column(db.Float)
-    rewards = db.relationship('Reward', backref='points_program')
+    cards = db.relationship('Card', backref='points_program', lazy='dynamic')
+
+class SignupBonus(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    card_id = db.Column(db.Integer, db.ForeignKey('card.id'))
+    days_for_spend = db.Column(db.Integer)
+    minimum_spend = db.Column(db.Integer)
+    annual_fee = db.Column(db.Integer)
+    annual_fee_waived = db.Column(db.VARCHAR(10))
+    bonus_points = db.Column(db.Integer)
+    from_date = db.Column(db.DATETIME, default='1970-01-01 00:00:00')
+    to_date = db.Column(db.DATETIME, default='2199-12-31 23:59:59')
+    status = db.Column(db.VARCHAR(15), default='active')
+
+####################################################
+#  Spending and Reward Category Info
+####################################################
+
+class RewardCategory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.VARCHAR(256), unique=True)
+    cards = db.relationship('Card', backref = 'reward_category', secondary='reward_category_lookup')
+
+class RewardCategoryLookup(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    card_id = db.Column(db.Integer, db.ForeignKey('card.id'))
+    reward_category_id = db.Column(db.Integer, db.ForeignKey('reward_category.id'))
+    company_name = db.Column(db.VARCHAR(255))
+    redeem_value = db.Column(db.Float)
+    cards = db.relationship('Card', backref=db.backref('card_reward_categories', cascade='all, delete-orphan'))
+    reward_categories = db.relationship('RewardCategory', backref=db.backref('reward_category_cards', cascade='all, delete-orphan'))
 
 class SpendingCategory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.VARCHAR(255))
-    cards = db.relationship('Card', backref = 'category', secondary='card_category_lookup')
+    name = db.Column(db.VARCHAR(255), unique=True)
+    cards = db.relationship('Card', backref = 'spending_category', secondary='spending_category_lookup')
 
-class CardCategoryLookup(db.Model):
+class SpendingCategoryLookup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     card_id = db.Column(db.Integer, db.ForeignKey('card.id'))
-    category_id = db.Column(db.Integer, db.ForeignKey('spending_category.id'))
-    cards = db.relationship('Card', backref=db.backref('card_categories', cascade='all, delete-orphan'))
-    categories = db.relationship('SpendingCategory', backref=db.backref('category_cards', cascade='all, delete-orphan'))
+    spending_category_id = db.Column(db.Integer, db.ForeignKey('spending_category.id'))
     company_name = db.Column(db.VARCHAR(255))
     earning_percent = db.Column(db.Float)
-
-class UserRewardLookup(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    reward_id = db.Column(db.Integer, db.ForeignKey('reward.id'))
-    rewards = db.relationship('Reward', backref=db.backref('user_rewards', cascade='all, delete-orphan'))
-    users = db.relationship('User', backref=db.backref('user_rewards', cascade='all, delete-orphan'))
-    active_date = db.Column(db.DATETIME)
-    cancel_date = db.Column(db.DATETIME)
-    status = db.Column(db.VARCHAR(256))
+    cards = db.relationship('Card', backref=db.backref('card_spending_categories', cascade='all, delete-orphan'))
+    spending_categories = db.relationship('SpendingCategory', backref=db.backref('spending_category_cards', cascade='all, delete-orphan'))

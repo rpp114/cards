@@ -3,8 +3,8 @@
 {% block content %}
   <h1>Hello {{ current_user.username}}, here's your first Card:</h1>
   <form action="" method="post" name="wallet_cards">
-  <h2><a href="{{ url_for('card_profile', card_id=suggested_card.card.id) }}">{{suggested_card.card.company.name}} - {{suggested_card.card.name}}</a></h2>
-  <button type="submit" name="card_id" value="{{suggested_card.card.id}}">Add to Wallet</button><button type="button">Apply For Card</button>
+  <h2><a href="{{ url_for('card_profile', card_id=suggested_card.id) }}">{{suggested_card.company.name}} - {{suggested_card.name}}</a></h2>
+  <button type="submit" name="card_id" value="{{suggested_card.id}}">Add to Wallet</button><button type="button">Apply For Card</button>
   <h3>Here's all the other ones you could get:</h3>
     {% for company in companies %}
       <h4> {{company.name}}</h4>

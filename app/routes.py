@@ -88,22 +88,21 @@ def user_cards():
 
 	if request.method == 'POST':
 		curr_time = datetime.datetime.now()
-		reward = models.Reward.query.filter(models.Reward.card.has(id=request.form.get('card_id')),models.Reward.from_date <= curr_time, models.Reward.to_date >= curr_time, models.Reward.status == 'active').first()
+		card = models.Card.query.get(request.form.get('card_id'))
 
 		user = current_user
-		user.rewards.append(reward)
+		user.cards.append(card)
 		db.session.add(user)
 		db.session.commit()
-		flash('Added {} to your wallet'.format(reward.card.name))
+		flash('Added {} to your wallet'.format(card.name))
 
 	companies = models.Company.query.order_by(models.Company.name).all()
 
-	user_cards = [reward.card for reward in current_user.rewards]
 
 	# Needs Algo to Suggest Card
-	suggested_card = models.Reward.query.filter_by(card_id=304).first()
+	suggested_card = models.Card.query.get(1)
 
-	return render_template('user_cards.html', companies=companies, suggested_card = suggested_card, user_cards = user_cards)
+	return render_template('user_cards.html', companies=companies, suggested_card = suggested_card, user_cards = current_user.cards)
 
 @app.route('/card')
 @login_required
@@ -114,9 +113,9 @@ def card_profile():
 
 	spending_categories = []
 
-	for i in range(len(card.categories)):
-		spending_categories.append((card.categories[i].name, card.card_categories[0].earning_percent))
+	for i in range(len(card.spending_categories)):
+		spending_categories.append((card.spending_categories[i].name, card.card_spending_categories[0].earning_percent))
 
-	reward = card.rewards.filter_by(status='active').first()
+	reward = card.signup_bonuses.filter_by(status='active').first()
 
-	return render_template('card_page.html', reward=reward, spending_categories = spending_categories)
+	return render_template('card_page.html',card=card, reward=reward, spending_categories = spending_categories)
