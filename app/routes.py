@@ -12,7 +12,7 @@ def index():
 
 	title = 'Travel Hacker'
 
-	return render_template('index.html', title=title, user=user, posts=posts)
+	return render_template('index.html', title=title)
 
 @app.route('/how_it_works')
 def how_it_works():
