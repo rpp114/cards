@@ -2,6 +2,7 @@ from app import db, login, app
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import URLSafeSerializer
+import datetime
 
 login_serializer = URLSafeSerializer(app.config['SECRET_KEY'])
 
@@ -61,7 +62,7 @@ class UserCardLookup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     card_id = db.Column(db.Integer, db.ForeignKey('card.id'))
-    active_date = db.Column(db.DATETIME)
+    active_date = db.Column(db.DATETIME, default = datetime.datetime.now())
     cancel_date = db.Column(db.DATETIME)
     status = db.Column(db.VARCHAR(15), default='active')
     user_cards = db.relationship('Card', backref=db.backref('user_cards', cascade='all, delete-orphan'))
@@ -85,8 +86,8 @@ class SignupBonus(db.Model):
     annual_fee = db.Column(db.Integer)
     annual_fee_waived = db.Column(db.VARCHAR(10))
     bonus_points = db.Column(db.Integer)
-    from_date = db.Column(db.DATETIME, default='1970-01-01 00:00:00')
-    to_date = db.Column(db.DATETIME, default='2199-12-31 23:59:59')
+    from_date = db.Column(db.DATETIME, default=datetime.datetime.min)
+    to_date = db.Column(db.DATETIME, default=datetime.datetime.max)
     status = db.Column(db.VARCHAR(15), default='active')
 
 ####################################################
