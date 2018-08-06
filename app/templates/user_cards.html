@@ -1,19 +1,28 @@
-{% extends "internal_base.html" %}
-
-{% block content %}
-  <h1>Hello {{ current_user.username}}, here's your first Card:</h1>
-  <form action="" method="post" name="wallet_cards">
+{% extends "internal_base.html" %} {% block content %}
+<h1>Hello {{ current_user.username}}, here's your first Card:</h1>
+<form action="" method="post" name="wallet_cards">
   <h2><a href="{{ url_for('card_profile', card_id=suggested_card.id) }}">{{suggested_card.company.name}} - {{suggested_card.name}}</a></h2>
-  <button type="submit" name="card_id" value="{{suggested_card.id}}">Add to Wallet</button><button type="button">Apply For Card</button>
+  <button class="button is-info is-focused" type="submit" name="card_id" value="{{suggested_card.id}}">Add to Wallet</button><button class="button is-primary is-focused" type="button">Apply For Card</button>
   <h3>Here's all the other ones you could get:</h3>
-    {% for company in companies %}
-      <h4> {{company.name}}</h4>
-        {% for card in company.cards %}
-          {% if card not in user_cards %}
-            <h6><a href="{{ url_for('card_profile', card_id=card.id) }}">{{card.name}}</a></h6>
-            <button type="submit" name="card_id" value="{{card.id}}">Add to Wallet</button><button type="button">Apply For Card</button>
-          {% endif %}
-        {% endfor %}
-    {% endfor %}
-  </form>
+  {% for company in companies %}
+  <h4> {{company.name}}</h4>
+  <table>
+  {% for card in company.cards %}
+  {% if card not in user_cards %}
+  <tr>
+    <td>
+      <h6 class=''><a href="{{ url_for('card_profile', card_id=card.id) }}">{{card.name}}</a></h6>
+    </td>
+    <td>
+      <button class="button is-info is-focused" type="submit" name="card_id" value="{{card.id}}">Add to Wallet</button>
+    </td>
+    <td>
+      <button class="button is-primary is-focused" type="button">Apply For Card</button>
+    </td>
+  </tr>
+  {% endif %}
+  {% endfor %}
+</table>
+  {% endfor %}
+</form>
 {% endblock %}

@@ -1,0 +1,24 @@
+<html>
+    <head>
+      <title>Welcome to Card Tracker!</title>
+      <link rel="stylesheet" href="/static/css/bulma.css">
+      <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+      <script src="/static/js/jquery-3.2.1.min.js"></script>
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <script>
+  $(document).ready(function() {
+    $(".navbar-burger").click(function() {
+      $(".navbar-burger").toggleClass('is-active')
+      $(".navbar-menu").toggleClass('is-active')
+    })
+  })
+</script>
+    </head>
+    <body>
+        <div class="columns is-centered is-mobile">
+            <div class="column is-two_thirds" style="max-width:900;">
+                {% block body %}{% endblock %}
+            </div>
+        </div>
+    </body>
+</html>

@@ -41,7 +41,7 @@ def signup():
 
 		login_user(user, remember=form.remember_me.data)
 
-		return redirect(url_for('user_cards'))
+		return redirect(url_for('wallet'))
 
 	return render_template('signup.html', form=form)
 
@@ -63,9 +63,15 @@ def login():
 		login_user(user, remember = form.remember_me.data)
 
 		flash('Logged in user: {}'.format(current_user.username))
-		return redirect(url_for('user_cards'))
+		return redirect(url_for('wallet'))
 
 	return render_template('login.html', title='Sign In', form=form)
+
+
+
+##############################################################
+# Users Views
+##############################################################
 
 @app.route('/user/wallet')
 @login_required
@@ -101,6 +107,11 @@ def user_cards():
 
 	return render_template('user_cards.html', companies=companies, suggested_card = suggested_card, user_cards = current_user.cards)
 
+
+##############################################################
+# Card Views
+##############################################################
+
 @app.route('/card')
 @login_required
 def card_profile():
@@ -116,3 +127,22 @@ def card_profile():
 	reward = card.signup_bonuses.filter_by(status='active').first()
 
 	return render_template('card_page.html',card=card, reward=reward, spending_categories = spending_categories)
+
+
+##############################################################
+# Admin Views
+##############################################################
+
+@app.route('/admin/card')
+@login_required
+def admin_card_profile():
+	card_id = request.args.get('card_id')
+
+	spending_categories = []
+
+	for i in range(len(card.spending_categories)):
+		spending_categories.append((card.spending_categories[i].name, card.card_spending_categories[0].earning_percent))
+
+	reward = card.signup_bonuses.filter_by(status='active').first()
+
+	return render_template('admin_card_page.html',card=card, reward=reward, spending_categories = spending_categories)

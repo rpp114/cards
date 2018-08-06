@@ -1,23 +1,38 @@
-<html>
-    <head>
-      <title>Welcome to Travel Hacking</title>
-    </head>
-    <body>
-        <div>
-            <a href="{{ url_for('index') }}">Home</a>  |  
-            <a href="{{ url_for('how_it_works') }}">How It Works</a>  |
-            <a href="{{ url_for('login') }}">Login</a>
-        </div>
-        <hr>
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <ul>
-            {% for message in messages %}
-            <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-        {% endwith %}
-        {% block content %}{% endblock %}
-    </body>
-</html>
+{% extends "base.html" %} {% block body %}
+<div class="navbar">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="{{url_for('index')}}">
+                                <img src="/static/img/ct_logo.png" alt="CrdTrckr" />
+                        </a>
+    <div class="navbar-burger burger" data-target="main-nav">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+  <div class="navbar-menu" id="main-nav">
+    <div class="navbar-item is-hoverable">
+        <a href="{{url_for('index') }}">Home</a>
+    </div>
+    <div class="navbar-item is-hoverable">
+        <a href="{{ url_for('how_it_works') }}">How It Works</a>
+    </div>
+    <span class="navbar-end">
+    <div class="navbar-item is-hoverable">
+        <a href="{{ url_for('login') }}">Login</a>
+    </div>
+    </span>
+  </div>
+  </div>
+        <hr style="margin:.25rem 0 0 0" />
+  {% with messages = get_flashed_messages() %} {% if messages %}
+  <ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %} {% endwith %}
+  <section class='section'>
+    {% block content %}{% endblock %}
+  </section>
+  {% endblock %}

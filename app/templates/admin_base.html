@@ -1,5 +1,6 @@
-{% extends "base.html" %} {% block body %}
+{% extends "base.html" %}
 
+{% block body %}
 <div class="navbar">
   <div class="navbar-brand">
     <a class="navbar-item" href="{{url_for('index')}}">
@@ -13,13 +14,10 @@
   </div>
   <div class="navbar-menu" id="main-nav">
     <div class="navbar-item is-hoverable">
-      <a href="{{url_for('wallet') }}">Wallet</a>
+      <a href="{{url_for('wallet') }}">Users</a>
     </div>
     <div class="navbar-item is-hoverable">
-      <a href="{{url_for('user_cards') }}">New Cards</a>
-    </div>
-    <div class="navbar-item is-hoverable">
-      <a href="{{ url_for('user_profile') }}">Profile</a>
+      <a href="{{url_for('user_cards') }}">Cards</a>
     </div>
     <div class="navbar-item is-hoverable">
       <a href="{{ url_for('user_profile') }}">Articles</a>
@@ -33,15 +31,15 @@
   </div>
 </div>
 <hr style="margin:.25rem 0 0 0" />
-{% with messages = get_flashed_messages() %}
- {% if messages %}
-<ul>
-  {% for message in messages %}
-  <li>{{ message }}</li>
-  {% endfor %}
-</ul>
-{% endif %} {% endwith %}
-<section class='section'>
-  {% block content %}{% endblock %}
-</section>
+        
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
 {% endblock %}
