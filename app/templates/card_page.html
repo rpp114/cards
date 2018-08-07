@@ -1,6 +1,8 @@
 {% extends "internal_base.html" %}
 
-{% block body %}
+{% block content %}
+<div class="content">
+
   <h1>{{card.name}}</h1>
   <p>Card Type: {{card.card_type|title}}</p>
   <p>Points Program: {{card.points_program.name}}</p>
@@ -15,4 +17,5 @@
 
   {% endfor %}
   <h3>Comments</h3>
+</div>
 {% endblock %}

@@ -1,28 +1,118 @@
 {% extends "internal_base.html" %} {% block content %}
-<h1>Hello {{ current_user.username}}, here's your first Card:</h1>
-<form action="" method="post" name="wallet_cards">
-  <h2><a href="{{ url_for('card_profile', card_id=suggested_card.id) }}">{{suggested_card.company.name}} - {{suggested_card.name}}</a></h2>
-  <button class="button is-info is-focused" type="submit" name="card_id" value="{{suggested_card.id}}">Add to Wallet</button><button class="button is-primary is-focused" type="button">Apply For Card</button>
+<script>
+function show_modal(card){
+  document.getElementById('modal').classList.add('is-active');
+  document.getElementById('modal_card_name').text = card.name;
+  document.getElementById('card_id_input').value = card.id;
+};
+
+function close_modal(){
+  document.getElementById('modal').classList.remove('is-active');
+};
+
+$(document).ready(function() {
+    $('.date_input').datepicker();
+   });
+
+</script>
+
+<div class="modal" id="modal">
+  <div class="modal-background" onClick="close_modal()"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title" id="modal_card_name">Card Name</p>
+    </header>
+    <section class="modal-card-body">
+      <form action="" method="post" name="wallet_cards">
+        <input type="hidden" id="card_id_input" value="" name="card_id" />
+        <div class="field is-horizontal">
+          <span class="field-label">
+            <label class="label">Activation Date:</label>
+          </span>
+        <div class="field-body">
+        <div class="control">
+          <input type="text" class="date_input" name="activation_date" />
+        </div>
+      </div>
+      </div>
+        <div class="field is-horizontal">
+          <span class="field-label">
+            <label class="label">Expiration Date:</label>
+          </span>
+        <div class="field-body is-right">
+        <div class="control">
+          <input type="text" class="date_input" name="expiration_date" />
+        </div>
+      </div>
+      </div>
+    </section>
+    <footer class="modal-card-foot">
+      <span class="level">
+        <div class="level-left">
+        <div class="level-item">
+
+        <button class="button is-success" type="submit">Add to Wallet</button>
+      </div>
+      </div>
+        <div class="level-right">
+        <div class="level-item">
+          <button class="button is-light" id="cancel_button" type="button" onClick="close_modal()">Cancel</button>
+      </div>
+      </div>
+      </span>
+    </footer>
+    </form>
+  </div>
+</div>
+
+<div class="content">
+  <h1>Hello {{ current_user.username}}, here's your first Card:</h1>
+  <div class="level">
+    <div class="level-left">
+      <div class="level-item">
+        <h4>{{suggested_card.company.name}}</h4>
+      </div>
+      <div class="level-item">
+        <h4>{{suggested_card.name}}</h4>
+      </div>
+    </div>
+    <div class="level-right">
+      <div class="level-item">
+        <button class="button is-info" type="button" name="card_id" onclick="show_modal({'name': '{{suggested_card.name}}', 'id':'{{suggested_card.id}}'})">Add to Wallet</button>
+      </div>
+      <div class="level-item">
+        <button class="button is-light" onClick="location.href='/card?card_id={{suggested_card.id}}'" type="button">Card Details</button>
+      </div>
+      <div class="level-item">
+        <button class="button is-success" type="button">Apply For Card</button>
+      </div>
+    </div>
+  </div>
   <h3>Here's all the other ones you could get:</h3>
-  {% for company in companies %}
-  <h4> {{company.name}}</h4>
-  <table>
-  {% for card in company.cards %}
+  {% for card in cards %}
   {% if card not in user_cards %}
-  <tr>
-    <td>
-      <h6 class=''><a href="{{ url_for('card_profile', card_id=card.id) }}">{{card.name}}</a></h6>
-    </td>
-    <td>
-      <button class="button is-info is-focused" type="submit" name="card_id" value="{{card.id}}">Add to Wallet</button>
-    </td>
-    <td>
-      <button class="button is-primary is-focused" type="button">Apply For Card</button>
-    </td>
-  </tr>
+    <div class="level">
+        <div class="level-left" id="card_name" onmouseover="console.log('this is moused over')">
+          <div class="level-item">
+          <h6 class=''>{{card.company.name}}</h6>
+        </div>
+          <div class="level-item">
+          <h6 class=''>{{card.name}}</h6>
+        </div>
+    </div>
+    <div class="level-right">
+      <div class="level-item">
+      <button class="button is-info wallet" onclick="show_modal({'name':'{{card.name}}', 'id':'{{card.id}}'})" type="button" name="card_id" value="{{card.id}}">Add to Wallet</button>
+    </div>
+    <div class="level-item">
+      <button class="button is-light" onClick="location.href='/card?card_id={{card.id}}'" type="button">Card Details</button>
+    </div>
+    <div class="level-item">
+      <button class="button is-success" type="button">Apply For Card</button>
+    </div>
+    </div>
+  </div>
   {% endif %}
   {% endfor %}
-</table>
-  {% endfor %}
-</form>
+</div>
 {% endblock %}

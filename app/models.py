@@ -63,6 +63,7 @@ class UserCardLookup(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     card_id = db.Column(db.Integer, db.ForeignKey('card.id'))
     active_date = db.Column(db.DATETIME, default = datetime.datetime.now())
+    expiration_date = db.Column(db.DATETIME)
     cancel_date = db.Column(db.DATETIME)
     status = db.Column(db.VARCHAR(15), default='active')
     user_cards = db.relationship('Card', backref=db.backref('user_cards', cascade='all, delete-orphan'))

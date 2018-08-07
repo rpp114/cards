@@ -90,22 +90,25 @@ def user_profile():
 def user_cards():
 
 	if request.method == 'POST':
-		curr_time = datetime.datetime.now()
-		card = models.Card.query.get(request.form.get('card_id'))
 
-		user = current_user
-		user.cards.append(card)
-		db.session.add(user)
+		user_card = models.UserCardLookup(user_id=current_user.id,
+										  card_id=request.form.get('card_id'))
+		if request.form.get('activation_date', None):
+			user_card.active_date = request.form.get('activation_date')
+		if request.form.get('expiration_date', None):
+			user_card.expiration_date = request.form.get('expiration_date')
+		db.session.add(user_card)
 		db.session.commit()
+		card = models.Card.query.get(card_id)
 		flash('Added {} to your wallet'.format(card.name))
 
-	companies = models.Company.query.order_by(models.Company.name).all()
+	cards = models.Card.query.all()
 
 
 	# Needs Algo to Suggest Card
 	suggested_card = models.Card.query.get(1)
 
-	return render_template('user_cards.html', companies=companies, suggested_card = suggested_card, user_cards = current_user.cards)
+	return render_template('user_cards.html', cards=cards, suggested_card = suggested_card, user_cards = current_user.cards)
 
 
 ##############################################################
