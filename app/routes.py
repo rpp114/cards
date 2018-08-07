@@ -77,7 +77,7 @@ def login():
 @login_required
 def wallet():
 
-	return render_template('wallet.html',user=current_user)
+	return render_template('user_wallet.html',user=current_user)
 
 @app.route('/user/profile')
 @login_required
