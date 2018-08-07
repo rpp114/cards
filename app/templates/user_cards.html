@@ -1,26 +1,26 @@
 {% extends "internal_base.html" %} {% block content %}
 <script>
+
+$(document).ready(function() {
+  $('.date_input').datepicker();
+});
+
 function show_modal(card){
-  document.getElementById('modal').classList.add('is-active');
-  document.getElementById('modal_card_name').text = card.name;
+  document.getElementById('modal_card_name').innerHTML = card.name;
   document.getElementById('card_id_input').value = card.id;
+  document.getElementById('modal').classList.add('is-active');
 };
 
 function close_modal(){
   document.getElementById('modal').classList.remove('is-active');
 };
-
-$(document).ready(function() {
-    $('.date_input').datepicker();
-   });
-
 </script>
 
 <div class="modal" id="modal">
   <div class="modal-background" onClick="close_modal()"></div>
   <div class="modal-card">
     <header class="modal-card-head">
-      <p class="modal-card-title" id="modal_card_name">Card Name</p>
+      <p class="modal-card-title" id="modal_card_name"></p>
     </header>
     <section class="modal-card-body">
       <form action="" method="post" name="wallet_cards">
