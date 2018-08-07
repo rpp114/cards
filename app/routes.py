@@ -94,12 +94,12 @@ def user_cards():
 		user_card = models.UserCardLookup(user_id=current_user.id,
 										  card_id=request.form.get('card_id'))
 		if request.form.get('activation_date', None):
-			user_card.active_date = request.form.get('activation_date')
+			user_card.active_date = datetime.datetime.strptime(request.form.get('activation_date'),'%m/%d/%Y')
 		if request.form.get('expiration_date', None):
-			user_card.expiration_date = request.form.get('expiration_date')
+			user_card.expiration_date = datetime.datetime.strptime(request.form.get('expiration_date'),'%m/%d/%Y')
 		db.session.add(user_card)
 		db.session.commit()
-		card = models.Card.query.get(card_id)
+		card = models.Card.query.get(request.form.get('card_id'))
 		flash('Added {} to your wallet'.format(card.name))
 
 	cards = models.Card.query.all()
