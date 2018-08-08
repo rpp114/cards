@@ -17,9 +17,9 @@ class User(UserMixin, db.Model):
     email = db.Column(db.VARCHAR(256), index=True, unique=True)
     password = db.Column(db.VARCHAR(256))
     session_token = db.Column(db.VARCHAR(256))
-    status = db.Column(db.VARCHAR(15), default='active')
-    first_login = db.Column(db.SMALLINT(), default=1)
-    admin = db.Column(db.SMALLINT(), default=0)
+    active = db.Column(db.BOOLEAN(), default=1)
+    first_login = db.Column(db.BOOLEAN(), default=1)
+    admin = db.Column(db.BOOLEAN(), default=0)
     cards = db.relationship('Card', secondary='user_card_lookup')
 
     def __repr__(self):
@@ -36,9 +36,6 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
-
-    def adjust_admin(self):
-        self.admin = not self.admin
 
 ####################################################
 #  Card and Company Definitions -- User Join to Cards
@@ -69,7 +66,7 @@ class UserCardLookup(db.Model):
     active_date = db.Column(db.DATETIME, default = datetime.datetime.now())
     expiration_date = db.Column(db.DATETIME)
     cancel_date = db.Column(db.DATETIME)
-    status = db.Column(db.VARCHAR(15), default='active')
+    active = db.Column(db.BOOLEAN(), default=1)
     user_cards = db.relationship('Card', backref=db.backref('user_cards', cascade='all, delete-orphan'))
     card_users = db.relationship('User', backref=db.backref('card_users', cascade='all, delete-orphan'))
 
@@ -93,7 +90,7 @@ class SignupBonus(db.Model):
     bonus_points = db.Column(db.Integer)
     from_date = db.Column(db.DATETIME, default=datetime.datetime.min)
     to_date = db.Column(db.DATETIME, default=datetime.datetime.max)
-    status = db.Column(db.VARCHAR(15), default='active')
+    active = db.Column(db.BOOLEAN(), default=1)
 
 ####################################################
 #  Spending and Reward Category Info

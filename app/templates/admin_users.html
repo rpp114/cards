@@ -19,10 +19,10 @@
           {% endif %}
         </div>
         <div class="level-item">
-          {% if user.status == 'active' %}
-          <button class="button is-danger is-outlined" type="button">Deactivate</button>
+          {% if user.active %}
+          <button class="button is-danger is-outlined" type="button" onClick="location.href='{{url_for('adjust_user', action='status', user_id=user.id)}}'">Deactivate</button>
           {% else %}
-          <button class="button is-success is-outlined" type="button">Activate</button>
+          <button class="button is-success is-outlined"  onClick="location.href='{{url_for('adjust_user', action='status', user_id=user.id)}}'" type="button">Activate</button>
           {% endif %}
         </div>
       </span>

@@ -32,7 +32,7 @@ def signup():
 	form = SignupForm()
 
 	if form.validate_on_submit():
-		user = models.User(username=form.username.data, email=form.email.data, status='active')
+		user = models.User(username=form.username.data, email=form.email.data, active=1)
 		user.set_password(form.password.data)
 		user.set_session_token()
 
@@ -163,9 +163,14 @@ def adjust_user():
 	action = request.args.get('action')
 
 	user = models.User.query.get(user_id)
+
 	if action == 'admin':
-		user.adjust_admin()
-		db.session.commit()
+		user.admin = not user.admin
+
+	if action == 'status':
+		user.active = not user.active
+
+	db.session.commit()
 	return redirect(url_for('admin_users'))
 
 @app.route('/admin/cards')

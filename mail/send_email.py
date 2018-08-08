@@ -26,7 +26,7 @@ def send_mail():
                     inner join company on company.id = company_id
                     inner join signup_bonus b on b.card_id = card.id and lookup.active_date between b.from_date and b.to_date
                     where lookup.user_id = {}
-                    and lookup.status = 'active';""".format(user.id)
+                    and lookup.active = 1;""".format(user.id)
 
         cards = db.session.execute(query)
 
