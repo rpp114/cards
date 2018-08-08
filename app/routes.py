@@ -163,7 +163,6 @@ def adjust_user():
 	action = request.args.get('action')
 
 	user = models.User.query.get(user_id)
-	print(user)
 	if action == 'admin':
 		user.adjust_admin()
 		db.session.commit()

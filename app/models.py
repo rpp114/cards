@@ -18,7 +18,7 @@ class User(UserMixin, db.Model):
     password = db.Column(db.VARCHAR(256))
     session_token = db.Column(db.VARCHAR(256))
     status = db.Column(db.VARCHAR(15), default='active')
-    first_login = db.Column(db.SMALLINT())
+    first_login = db.Column(db.SMALLINT(), default=1)
     admin = db.Column(db.SMALLINT(), default=0)
     cards = db.relationship('Card', secondary='user_card_lookup')
 
