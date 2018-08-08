@@ -29,7 +29,7 @@ class User(UserMixin, db.Model):
         return str(self.session_token)
 
     def set_session_token(self):
-        self.session_token = login_serializer.dumps([self.username,self.password,self.status])
+        self.session_token = login_serializer.dumps([self.username,self.password,self.active])
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
