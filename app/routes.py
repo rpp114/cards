@@ -127,7 +127,7 @@ def card_profile():
 	for i in range(len(card.spending_categories)):
 		spending_categories.append((card.spending_categories[i].name, card.card_spending_categories[0].earning_percent))
 
-	reward = card.signup_bonuses.filter_by(status='active').first()
+	reward = card.signup_bonuses.filter_by(active=1).first()
 
 	return render_template('card_page.html',card=card, reward=reward, spending_categories = spending_categories)
 
@@ -196,6 +196,6 @@ def admin_card():
 	for i in range(len(card.spending_categories)):
 		spending_categories.append((card.spending_categories[i].name, card.card_spending_categories[0].earning_percent))
 
-	reward = card.signup_bonuses.filter_by(status='active').first()
+	reward = card.signup_bonuses.filter_by(active=1).first()
 
 	return render_template('admin_card.html',card=card, reward=reward, spending_categories = spending_categories)
