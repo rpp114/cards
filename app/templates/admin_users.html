@@ -1,0 +1,34 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+  <div class="content">
+    <h1>Users</h1>
+    {% for user in users %}
+    <div class="level">
+      <span class="level-right">
+        <div class="level-item">
+          <p>{{user.username}}</p>
+        </div>
+      </span>
+      <span class="level-left">
+        <div class="level-item">
+          {% if user.admin %}
+          <button class="button is-danger" type="button"  onClick="location.href='{{url_for('adjust_user', action='admin', user_id=user.id)}}'">Remove Admin</button>
+          {% else %}
+          <button class="button is-primary" type="button" onClick="location.href='{{url_for('adjust_user', action='admin', user_id=user.id)}}'">Make Admin</button>
+          {% endif %}
+        </div>
+        <div class="level-item">
+          {% if user.status == 'active' %}
+          <button class="button is-danger is-outlined" type="button">Deactivate</button>
+          {% else %}
+          <button class="button is-success is-outlined" type="button">Activate</button>
+          {% endif %}
+        </div>
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+
+
+{% endblock %}

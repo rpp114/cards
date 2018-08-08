@@ -1,0 +1,23 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+  <div class="content">
+    <h1>Cards</h1>
+    {% for card in cards %}
+    <div class="level">
+      <span class="level-right">
+        <div class="level-item">
+          <p>{{card.company.name + " | " + card.name}}</p>
+        </div>
+      </span>
+      <span class="level-left">
+        <div class="level-item">
+          <button class="button is-primary" type="button" onClick="location.href='{{url_for('admin_card', card_id=card.id)}}'">Edit Card</button>
+        </div>
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+  <button class="button is-primary" type="button" onClick="location.href='{{url_for('admin_card')}}'">Add New Card</button>
+
+{% endblock %}

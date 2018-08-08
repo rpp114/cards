@@ -13,17 +13,35 @@
     </div>
   </div>
   <div class="navbar-menu" id="main-nav">
-    <div class="navbar-item is-hoverable">
-      <a href="{{url_for('wallet') }}">Users</a>
+    <div class="navbar-item has-dropdown is-hoverable">
+    <div class="navbar-item is-active">
+      Users
     </div>
-    <div class="navbar-item is-hoverable">
-      <a href="{{url_for('user_cards') }}">Cards</a>
+      <div class="navbar-dropdown">
+        <a class="navbar-item" href="{{url_for('admin_users')}}">Users</a>
+      </div>
     </div>
-    <div class="navbar-item is-hoverable">
-      <a href="{{ url_for('user_profile') }}">Articles</a>
+    <div class="navbar-item has-dropdown is-hoverable">
+    <div class="navbar-item is-active">
+      Cards
+    </div>
+      <div class="navbar-dropdown">
+        <a class="navbar-item" href="{{url_for('admin_cards')}}">Cards</a>
+      </div>
+    </div>
+    <div class="navbar-item has-dropdown is-hoverable">
+    <div class="navbar-item is-active">
+      Suggestions
+    </div>
+      <div class="navbar-dropdown">
+        <a class="navbar-item" href="{{url_for('admin')}}">Suggestions</a>
+      </div>
     </div>
     <span class="navbar-end">
-    <div class="navbar-item is-hoverable">
+    <div class="navbar-item">
+        <a href="{{ url_for('user_wallet') }}">Wallet</a>
+    </div>
+    <div class="navbar-item">
         <a href="{{ url_for('logout') }}">Logout</a>
     </div>
   </span>
@@ -31,7 +49,7 @@
   </div>
 </div>
 <hr style="margin:.25rem 0 0 0" />
-        
+
         {% with messages = get_flashed_messages() %}
         {% if messages %}
         <ul>

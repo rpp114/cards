@@ -13,7 +13,7 @@
   </div>
   <div class="navbar-menu" id="main-nav">
     <div class="navbar-item is-hoverable">
-      <a href="{{url_for('wallet') }}">Wallet</a>
+      <a href="{{url_for('user_wallet') }}">Wallet</a>
     </div>
     <div class="navbar-item is-hoverable">
       <a href="{{url_for('user_cards') }}">New Cards</a>
@@ -25,10 +25,11 @@
       <a href="{{ url_for('user_profile') }}">Articles</a>
     </div>
     <span class="navbar-end">
+      {% if current_user.admin %}
     <div class="navbar-item is-hoverable">
-        <!-- <a href="{{ url_for('admin_card_profile', card_id=3) }}">Admin</a> -->
-        <p>Admin</p>
+        <a href="{{ url_for('admin') }}">Admin</a>
     </div>
+    {% endif %}
     <div class="navbar-item is-hoverable">
         <a href="{{ url_for('logout') }}">Logout</a>
     </div>

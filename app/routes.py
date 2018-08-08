@@ -41,7 +41,7 @@ def signup():
 
 		login_user(user, remember=form.remember_me.data)
 
-		return redirect(url_for('wallet'))
+		return redirect(url_for('user_wallet'))
 
 	return render_template('signup.html', form=form)
 
@@ -63,7 +63,7 @@ def login():
 		login_user(user, remember = form.remember_me.data)
 
 		flash('Logged in user: {}'.format(current_user.username))
-		return redirect(url_for('wallet'))
+		return redirect(url_for('user_wallet'))
 
 	return render_template('login.html', title='Sign In', form=form)
 
@@ -75,7 +75,7 @@ def login():
 
 @app.route('/user/wallet')
 @login_required
-def wallet():
+def user_wallet():
 
 	return render_template('user_wallet.html',user=current_user)
 
@@ -136,10 +136,56 @@ def card_profile():
 # Admin Views
 ##############################################################
 
+@app.route('/admin')
+@login_required
+def admin():
+	if not current_user.admin:
+		return redirect(url_for('index'))
+
+	return render_template('admin.html')
+
+
+@app.route('/admin/users')
+@login_required
+def admin_users():
+	if not current_user.admin:
+		return redirect(url_for('index'))
+	users = models.User.query.all()
+
+	return render_template('admin_users.html', users=users)
+
+@app.route('/admin/adjust_user')
+@login_required
+def adjust_user():
+	if not current_user.admin:
+		return redirect(url_for('index'))
+	user_id = request.args.get('user_id')
+	action = request.args.get('action')
+
+	user = models.User.query.get(user_id)
+	print(user)
+	if action == 'admin':
+		user.adjust_admin()
+		db.session.commit()
+	return redirect(url_for('admin_users'))
+
+@app.route('/admin/cards')
+@login_required
+def admin_cards():
+	if not current_user.admin:
+		return redirect(url_for('index'))
+	cards = models.Card.query.all()
+
+	return render_template('admin_cards.html', cards=cards)
+
 @app.route('/admin/card')
 @login_required
-def admin_card_profile():
+def admin_card():
+	if not current_user.admin:
+		return redirect(url_for('index'))
 	card_id = request.args.get('card_id')
+
+	card = models.Card.query.get(card_id)
 
 	spending_categories = []
 
@@ -148,4 +194,4 @@ def admin_card_profile():
 
 	reward = card.signup_bonuses.filter_by(status='active').first()
 
-	return render_template('admin_card_page.html',card=card, reward=reward, spending_categories = spending_categories)
+	return render_template('admin_card.html',card=card, reward=reward, spending_categories = spending_categories)

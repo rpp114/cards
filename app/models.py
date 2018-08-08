@@ -19,6 +19,7 @@ class User(UserMixin, db.Model):
     session_token = db.Column(db.VARCHAR(256))
     status = db.Column(db.VARCHAR(15), default='active')
     first_login = db.Column(db.SMALLINT())
+    admin = db.Column(db.SMALLINT(), default=0)
     cards = db.relationship('Card', secondary='user_card_lookup')
 
     def __repr__(self):
@@ -35,6 +36,9 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
+
+    def adjust_admin(self):
+        self.admin = not self.admin
 
 ####################################################
 #  Card and Company Definitions -- User Join to Cards
