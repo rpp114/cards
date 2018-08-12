@@ -27,17 +27,17 @@
     <span class="navbar-end">
       {% if current_user.admin %}
     <div class="navbar-item is-hoverable">
-        <a href="{{ url_for('admin') }}">Admin</a>
+        <a class="has-text-black" href="{{ url_for('admin') }}">Admin</a>
     </div>
     {% endif %}
     <div class="navbar-item is-hoverable">
-        <a href="{{ url_for('logout') }}">Logout</a>
+        <a class="has-text-black" href="{{ url_for('logout') }}">Logout</a>
     </div>
   </span>
 
   </div>
 </div>
-<hr style="margin:.25rem 0 0 0" />
+<hr style="margin:.25rem 0 .25rem 0" />
 {% with messages = get_flashed_messages() %}
 {% if messages %}
     {% for message in messages %}

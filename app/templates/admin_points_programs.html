@@ -1,0 +1,26 @@
+{% extends "admin_base.html" %} {% block content %}
+
+<div class="content">
+  <div class="level">
+    <div class="level-left">
+      <span class="level-item"><h1>Points Programs</h1></span>
+      <span class="level-item"><button class="button is-primary is-small" type="button" onClick="location.href='{{url_for('admin_points_program')}}'">Add New Program</button></span>
+    </div>
+  </div>
+  {% for program in programs %}
+  <div class="level">
+    <span class="level-left">
+        <div class="level-item">
+          <p>{{program.name}}</p>
+        </div>
+      </span>
+    <span class="level-right">
+        <div class="level-item">
+          <button class="button is-primary is-small" type="button" onClick="location.href='{{url_for('admin_points_program', program_id=program.id)}}'">Edit Program</button>
+        </div>
+      </span>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

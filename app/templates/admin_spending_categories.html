@@ -3,15 +3,15 @@
 {% block content %}
 <script>
 function addForm() {
-  form = `<form class="form level" action="{{url_for('admin_company')}}" method="post">
+  form = `<form class="form level" action="{{url_for('admin_spending_category')}}" method="post">
   <div class="level-left">
       <div class="field is-horizontal level-item">
       <div class="field-label">
-        <label class="label">Company Name:</label>
+        <label class="label">Category Name:</label>
       </div>
       <div class="field-body">
         <div class="control">
-          <input type='text' name="name" placeholder="New Company Name" />
+          <input type='text' name="name" placeholder="New Category Name" />
         </div>
       </div>
     </div>
@@ -21,10 +21,7 @@ function addForm() {
 
   form_span = document.getElementById('form_span')
   form_span.innerHTML = form
-
 };
-
-
 </script>
 
 
@@ -32,24 +29,21 @@ function addForm() {
   <div class="content">
     <div class="level">
       <div class="level-left">
-        <span class="level-item"><h1>Companies</h1></span>
-        <span class="level-item"><button class="button is-primary is-small" type="button" onClick="addForm()">Add New Company</button></span>
+        <span class="level-item"><h1>Spending Categories</h1></span>
+        <span class="level-item"><button class="button is-primary is-small" type="button" onClick="addForm()">Add New Category</button></span>
       </div>
     </div>
     <span id='form_span'></span>
-    {% for company in companies %}
+    {% for category in categories %}
     <div class="level">
       <span class="level-left">
         <div class="level-item">
-          <p>{{company.name}}</p>
+          <p>{{category.name}}</p>
         </div>
       </span>
       <span class="level-right">
         <div class="level-item">
-          <button class="button is-primary is-small" type="button" onClick="location.href='{{url_for('admin_company', company_id=company.id)}}'">Edit Company</button>
-        </div>
-        <div class="level-item">
-          <button class="button is-info is-outlined is-small" type="button" onClick="location.href='{{url_for('admin_cards', company_id=company.id)}}'">See Cards</button>
+          <button class="button is-primary is-small" type="button" onClick="location.href='{{url_for('admin_spending_category', spending_category_id=category.id)}}'">Edit Category</button>
         </div>
       </span>
     </div>

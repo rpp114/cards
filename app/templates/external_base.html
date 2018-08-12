@@ -12,19 +12,19 @@
   </div>
   <div class="navbar-menu" id="main-nav">
     <div class="navbar-item is-hoverable">
-        <a href="{{url_for('index') }}">Home</a>
+        <a class="has-text-black" href="{{url_for('index') }}">Home</a>
     </div>
     <div class="navbar-item is-hoverable">
-        <a href="{{ url_for('how_it_works') }}">How It Works</a>
+        <a class="has-text-black" href="{{ url_for('how_it_works') }}">How It Works</a>
     </div>
     <span class="navbar-end">
     <div class="navbar-item is-hoverable">
-        <a href="{{ url_for('login') }}">Login</a>
+        <a class="has-text-black" href="{{ url_for('login') }}">Login</a>
     </div>
     </span>
   </div>
   </div>
-        <hr style="margin:.25rem 0 0 0" />
+        <hr style="margin:.25rem 0 .25rem 0" />
         {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}

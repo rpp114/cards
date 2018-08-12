@@ -62,7 +62,6 @@ def login():
 
 		login_user(user, remember = form.remember_me.data)
 
-		flash('Logged in user: {}'.format(current_user.username))
 		return redirect(url_for('user_wallet'))
 
 	return render_template('login.html', title='Sign In', form=form)
@@ -144,6 +143,9 @@ def admin():
 
 	return render_template('admin.html')
 
+######################################################################
+#  Views for Admin of Users
+######################################################################
 
 @app.route('/admin/users')
 @login_required
@@ -173,6 +175,10 @@ def adjust_user():
 	db.session.commit()
 	return redirect(url_for('admin_users'))
 
+######################################################################
+#  Views for Admin of Cards
+######################################################################
+
 @app.route('/admin/cards')
 @login_required
 def admin_cards():
@@ -200,7 +206,6 @@ def admin_card():
 	card_id = request.args.get('card_id')
 	company_id = request.args.get('company_id')
 
-
 	card = None
 	form = CardForm()
 
@@ -215,6 +220,9 @@ def admin_card():
 
 	if request.method == 'POST':
 		data = request.form
+		new= False
+		if not card:
+			new = True
 
 		card = models.Card() if not card else card
 		card.points_program_id = data.get('points_program_id')
@@ -229,19 +237,117 @@ def admin_card():
 
 		flash('Added {} to {}.'.format(card.name, card.company.name))
 
+		if new:
+			return redirect(url_for('admin_card', card_id=card.id))
+
 		return redirect(url_for('admin_cards', company_id=card.company_id))
 
 	form.points_program_id.choices = [(pp.id, pp.name) for pp in models.PointsProgram.query.filter_by(active=1).order_by(models.PointsProgram.name).all()]
 
 	spending_categories = []
+	signup_bonus = None
+
+	if card:
+		spending_categories = models.SpendingCategory.query\
+			.join(models.SpendingCategoryLookup,models.SpendingCategory.id==models.SpendingCategoryLookup.spending_category_id)\
+			.add_columns(models.SpendingCategoryLookup.id, models.SpendingCategory.name, models.SpendingCategoryLookup.company_name, models.SpendingCategoryLookup.earning_percent)\
+			.filter(models.SpendingCategoryLookup.card_id == card.id, models.SpendingCategory.active == 1, models.SpendingCategoryLookup.active == 1)\
+			.order_by(models.SpendingCategory.name, models.SpendingCategoryLookup.earning_percent.desc()).all()
+
+		signup_bonus = card.signup_bonuses.filter_by(active=1).first()
 
 	# for i in range(len(card.spending_categories)):
 	# 	spending_categories.append((card.spending_categories[i].name, card.card_spending_categories[0].earning_percent))
 
-	reward = [] #card.signup_bonuses.filter_by(active=1).first()
-	# card = models.Card.query.get(card_id)
 
-	return render_template('admin_card.html', form=form, card=card, reward=reward, spending_categories = spending_categories, company=company)
+	return render_template('admin_card.html', form=form, card=card, spending_categories = spending_categories, company=company, signup_bonus=signup_bonus)
+
+
+@app.route('/admin/card/spending_category', methods=['GET', 'POST'])
+@login_required
+def admin_card_spending_category():
+	if not current_user.admin:
+		return redirect(url_for('index'))
+
+	card_id = request.args.get('card_id')
+	card_category_id = request.args.get('card_category_id')
+
+	card = models.Card.query.get(card_id)
+
+	spending_category_lookup = None
+	form = CardSpendingCategoryForm(card_id=card_id)
+
+	if card_category_id:
+		spending_category_lookup = models.SpendingCategoryLookup.query.get(card_category_id)
+		form = CardSpendingCategoryForm(obj=spending_category_lookup)
+
+	if request.method == 'POST':
+
+		spending_category_lookup = models.SpendingCategoryLookup() if not spending_category_lookup else spending_category_lookup
+
+		spending_category_lookup.card_id = request.form.get('card_id')
+		spending_category_lookup.spending_category_id = request.form.get('spending_category_id')
+		if request.form.get('company_name', '') != '':
+			spending_category_lookup.company_name = request.form.get('company_name')
+		spending_category_lookup.earning_percent = request.form.get('earning_percent')
+
+		db.session.add(spending_category_lookup)
+		db.session.commit()
+
+		# flash(message.format(spending_category.name))
+
+		return redirect(url_for('admin_card', card_id=card_id))
+
+	form.spending_category_id.choices = [(sc.id, sc.name) for sc in models.SpendingCategory.query.filter_by(active=1).order_by(models.SpendingCategory.name).all()]
+
+	return render_template('admin_card_spending_category.html', form=form, lookup=spending_category_lookup, card=card)
+
+
+@app.route('/admin/spending_categories', methods=['GET','POST'])
+@login_required
+def admin_spending_categories():
+	if not current_user.admin:
+		return redirect(url_for('index'))
+
+	categories = models.SpendingCategory.query.filter_by(active=1).order_by(models.SpendingCategory.name).all()
+
+	return render_template('admin_spending_categories.html', categories=categories)
+
+@app.route('/admin/spending_category', methods=['GET', 'POST'])
+@login_required
+def admin_spending_category():
+	if not current_user.admin:
+		return redirect(url_for('index'))
+
+	spending_category_id = request.args.get('spending_category_id')
+
+	spending_category = None
+	form = SpendingCategoryForm()
+
+	if spending_category_id:
+		spending_category = models.SpendingCategory.query.get(spending_category_id)
+		form = SpendingCategoryForm(obj=spending_category)
+
+	if request.method == 'POST':
+		if spending_category == None:
+			message = 'Added New Spending Category {}'
+		else:
+			message = 'Updated Spending Category {}'
+
+		spending_category = models.SpendingCategory() if not spending_category else spending_category
+		spending_category.name = request.form.get('name')
+
+		db.session.add(spending_category)
+		db.session.commit()
+
+		return redirect(url_for('admin_spending_categories'))
+
+	return render_template('admin_spending_category.html', form=form, spending_category=spending_category)
+
+
+######################################################################
+#  Views for Admin of Sign UP Bonuses
+######################################################################
 
 @app.route('/admin/card/signup_bonuses', methods=['GET','POST'])
 @login_required
@@ -290,24 +396,60 @@ def admin_signup_bonuses():
 
 	return render_template('admin_signup_bonuses.html', card=card, signup_bonus=signup_bonus, form=form)
 
-@app.route('/admin/card/spening_categories', methods=['GET','POST'])
+@app.route('/admin/reward_categories', methods=['GET','POST'])
 @login_required
-def admin_spending_categories():
+def admin_reward_categories():
 	if not current_user.admin:
 		return redirect(url_for('index'))
 
-	card_id = request.args.get('card_id')
+	categories = models.RewardCategory.query.filter_by(active=1).order_by(models.RewardCategory.name).all()
 
-	return render_template('admin_signups.html', card=card, form=form)
+	return render_template('admin_reward_categories.html', categories=categories)
 
+@app.route('/admin/reward_category', methods=['GET', 'POST'])
+@login_required
+def admin_reward_category():
+	if not current_user.admin:
+		return redirect(url_for('index'))
 
-@app.route('/admin/companies')
+	reward_category_id = request.args.get('reward_category_id')
+
+	reward_category = None
+	form = RewardCategoryForm()
+
+	if reward_category_id:
+		reward_category = models.RewardCategory.query.get(reward_category_id)
+		form = RewardCategoryForm(obj=reward_category)
+
+	if request.method == 'POST':
+		if reward_category == None:
+			message = 'Added New Reward Category {}'
+		else:
+			message = 'Updated Reward Category {}'
+
+		reward_category = models.RewardCategory() if not reward_category else reward_category
+		reward_category.name = request.form.get('name')
+
+		db.session.add(reward_category)
+		db.session.commit()
+
+		flash(message.format(reward_category.name))
+
+		return redirect(url_for('admin_reward_categories'))
+
+	return render_template('admin_reward_category.html', form=form, reward_category=reward_category)
+
+######################################################################
+#  Views for Admin of Companies
+######################################################################
+
+@app.route('/admin/companies', methods=['GET', 'POST'])
 @login_required
 def admin_companies():
 	if not current_user.admin:
 		return redirect(url_for('index'))
 
-	companies = models.Company.query.filter_by(active=1).all()
+	companies = models.Company.query.filter_by(active=1).order_by(models.Company.name).all()
 
 	return render_template('admin_companies.html', companies=companies)
 
@@ -326,4 +468,127 @@ def admin_company():
 		company = models.Company.query.get(company_id)
 		form = CompanyForm(obj=company)
 
+	if request.method == 'POST':
+		if company == None:
+			message = 'Added New Copmany {}'
+		else:
+			message = 'Updated Company {}'
+
+		company = models.Company() if not company else company
+		company.name = request.form.get('name')
+
+		db.session.add(company)
+		db.session.commit()
+
+		flash(message.format(company.name))
+
+		return redirect(url_for('admin_companies'))
+
 	return render_template('admin_company.html', form=form, company=company)
+
+
+######################################################################
+#  Views for Admin of Points Programs
+######################################################################
+
+@app.route('/admin/points_programs')
+@login_required
+def admin_points_programs():
+	if not current_user.admin:
+		return redirect(url_for('index'))
+
+	programs = models.PointsProgram.query.filter_by(active=1).order_by(models.PointsProgram.name).all()
+
+	return render_template('admin_points_programs.html', programs=programs)
+
+@app.route('/admin/points_program', methods=['GET', 'POST'])
+@login_required
+def admin_points_program():
+	if not current_user.admin:
+		return redirect(url_for('index'))
+
+	program_id = request.args.get('program_id')
+
+	program = None
+	form = PointsProgramForm()
+
+	if program_id:
+		program = models.PointsProgram.query.get(program_id)
+		form = PointsProgramForm(obj=program)
+
+	if request.method == 'POST':
+		if program == None:
+			message = 'Added New Program {}'
+			new = True
+		else:
+			message = 'Updated Program {}'
+			new = False
+
+		program = models.PointsProgram() if not program else program
+		program.name = request.form.get('name')
+
+		db.session.add(program)
+		db.session.commit()
+
+		flash(message.format(program.name))
+
+		if new:
+			return redirect(url_for('admin_points_program', program_id=program.id))
+
+		return redirect(url_for('admin_points_programs'))
+
+	reward_categories = []
+
+	if program:
+		reward_categories = models.RewardCategory.query\
+			.join(models.RewardCategoryLookup,models.RewardCategory.id==models.RewardCategoryLookup.reward_category_id)\
+			.add_columns(models.RewardCategoryLookup.id, models.RewardCategory.name, models.RewardCategoryLookup.company_name, models.RewardCategoryLookup.redeem_value)\
+			.filter(models.RewardCategoryLookup.points_program_id == program.id, models.RewardCategory.active == 1, models.RewardCategoryLookup.active == 1)\
+			.order_by(models.RewardCategory.name, models.RewardCategoryLookup.redeem_value.desc()).all()
+
+	print('reward_category:', reward_categories)
+
+	return render_template('admin_points_program.html', form=form, program=program, reward_categories=reward_categories)
+
+@app.route('/admin/points_program/reward_category', methods=['GET', 'POST'])
+@login_required
+def admin_program_reward_category():
+	if not current_user.admin:
+		return redirect(url_for('index'))
+
+	program_id = request.args.get('program_id')
+	program_category_id = request.args.get('program_category_id')
+
+	program = models.PointsProgram.query.get(program_id)
+
+	reward_category_lookup = None
+	form = ProgramRewardCategoryForm(points_program_id=program_id)
+
+	if program_category_id:
+		reward_category_lookup = models.RewardCategoryLookup.query.get(program_category_id)
+		form = ProgramRewardCategoryForm(obj=reward_category_lookup)
+
+	if request.method == 'POST':
+
+		reward_category_lookup = models.RewardCategoryLookup() if not reward_category_lookup else reward_category_lookup
+		print(request.form)
+		reward_category_lookup.points_program_id = request.form.get('points_program_id')
+		reward_category_lookup.reward_category_id = request.form.get('reward_category_id')
+		if request.form.get('company_name', '') != '':
+			reward_category_lookup.company_name = request.form.get('company_name')
+		reward_category_lookup.redeem_value = request.form.get('redeem_value')
+
+		db.session.add(reward_category_lookup)
+		db.session.commit()
+
+		print('lookup:',reward_category_lookup)
+
+		# flash(message.format(spending_category.name))
+
+		return redirect(url_for('admin_points_program', program_id=program_id))
+
+	form.reward_category_id.choices = [(rc.id, rc.name) for rc in models.RewardCategory.query.filter_by(active=1).order_by(models.RewardCategory.name).all()]
+
+	form.points_program_id.data = program_id
+
+	return render_template('admin_program_reward_category.html', form=form, lookup=reward_category_lookup, program=program)

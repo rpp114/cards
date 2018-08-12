@@ -89,7 +89,9 @@
         </div>
       </div>
     </div>
-    <section class="section">
+    <button class="button is-success is-small" type="submit">Submit</button>
+  </form>
+    <hr />
     <div class="level container">
       <div class="level-left">
         <div class="level-item">
@@ -97,16 +99,22 @@
         </div>
         <div class="level-right">
           <div class="level-item">
-            <button class="button is-small is-outlined is-success" type="button" onClick="location.href='{{url_for('admin_signup_bonuses', card_id=card.id)}}'">Add SignUp Bonus</button>
+            <button class="button is-small is-outlined is-success" type="button" onClick="location.href='{{url_for('admin_signup_bonuses', card_id=card.id)}}'">Edit SignUp Bonus</button>
           </div>
         </div>
       </div>
     </div>
-    <p>
-      Space for Signup Bonus
-    </p>
-  </section>
-  <section class="section">
+    {% if signup_bonus %}
+    <table class="table">
+      <tr><td>Rewards Program:</td><td>{{signup_bonus.card.points_program.name}}</td></tr>
+      <tr><td>Sign Up Rewards:</td><td>{{"{:,}".format(signup_bonus.bonus_points)}}</td></tr>
+      <tr><td>Minimum Spend:</td><td>{{"${:,}".format(signup_bonus.minimum_spend)}}</td></tr>
+      <tr><td>Days to Minimum Spend:</td><td>{{signup_bonus.days_for_spend}}</td></tr>
+      <tr><td>Annual Fee:</td><td>{{"${:,}".format(signup_bonus.annual_fee)}}</td></tr>
+      <tr><td>Annual Fee Wavied:</td><td>{%if signup_bonus.annual_fee_waived%}Yes{%else%}No{%endif%}</td></tr>
+  </table>
+    {% endif %}
+    <hr />
     <div class="level container">
       <div class="level-left">
         <div class="level-item">
@@ -114,18 +122,22 @@
         </div>
         <div class="level-right">
           <div class="level-item">
-            <button class="button is-small is-outlined is-info" type="button" onClick="location.href='{{url_for('admin_spending_categories', card_id=card.id)}}'">Edit Spending Catgories</button>
+            <button class="button is-small is-outlined is-info" type="button" onClick="location.href='{{url_for('admin_card_spending_category', card_id=card.id)}}'">Add Spending Catgory</button>
           </div>
         </div>
       </div>
     </div>
-    <p>
-      Space for Signup Bonus
-    </p>
-  </section>
+    {% if spending_categories %}
+    <table class="table">
+      <tr><th>Category</th><th>Company</th><th>Earning</th><th></th><th></th></tr>
+      {% for cat in spending_categories %}
+      <tr><td>{{cat.name}}</td><td>{{cat.company_name}}</td><td>{{cat.earning_percent}}</td>
+      <td><button  class="button is-info is-small" type="button" onClick="location.href='{{url_for('admin_card_spending_category', card_id=card.id, card_category_id=cat.id)}}'">Edit</button></td>
+      <td><button  class="button is-danger is-small" type="button">Delete</button></td></tr>
+      {% endfor %}
+  </table>
+    {% endif %}
 
-    <button class="button is-success is-small" type="submit">Submit</button>
-  </form>
 
 </div>
 {% endblock %}

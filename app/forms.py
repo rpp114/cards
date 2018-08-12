@@ -54,7 +54,7 @@ class RewardCategoryForm(FlaskForm):
     name = StringField('Reward Category Name')
 
 class ProgramRewardCategoryForm(FlaskForm):
-    points_program_id = SelectField('Program Name')
+    points_program_id = HiddenField('Program Name')
     reward_category_id = SelectField('Reward Category Name')
     company_name = StringField('Reward Company Name')
     redeem_value = StringField('Point Value')
@@ -63,7 +63,7 @@ class SpendingCategoryForm(FlaskForm):
     name = StringField('Spending Category Name')
 
 class CardSpendingCategoryForm(FlaskForm):
-    card_id = SelectField('Card Name')
+    card_id = HiddenField('Card Name')
     spending_category_id = SelectField('Spending Category Name')
     company_name = StringField('Spending Company Name')
     earning_percent = StringField('Earning Percent')

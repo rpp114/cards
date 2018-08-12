@@ -13,16 +13,16 @@
       <span class="level-left">
         <div class="level-item">
           {% if user.admin %}
-          <button class="button is-danger" type="button"  onClick="location.href='{{url_for('adjust_user', action='admin', user_id=user.id)}}'">Remove Admin</button>
+          <button class="button is-danger is-small" type="button"  onClick="location.href='{{url_for('adjust_user', action='admin', user_id=user.id)}}'">Remove Admin</button>
           {% else %}
-          <button class="button is-primary" type="button" onClick="location.href='{{url_for('adjust_user', action='admin', user_id=user.id)}}'">Make Admin</button>
+          <button class="button is-primary is-small" type="button" onClick="location.href='{{url_for('adjust_user', action='admin', user_id=user.id)}}'">Make Admin</button>
           {% endif %}
         </div>
         <div class="level-item">
           {% if user.active %}
-          <button class="button is-danger is-outlined" type="button" onClick="location.href='{{url_for('adjust_user', action='status', user_id=user.id)}}'">Deactivate</button>
+          <button class="button is-danger is-outlined is-small" type="button" onClick="location.href='{{url_for('adjust_user', action='status', user_id=user.id)}}'">Deactivate</button>
           {% else %}
-          <button class="button is-success is-outlined"  onClick="location.href='{{url_for('adjust_user', action='status', user_id=user.id)}}'" type="button">Activate</button>
+          <button class="button is-success is-outlined is-small"  onClick="location.href='{{url_for('adjust_user', action='status', user_id=user.id)}}'" type="button">Activate</button>
           {% endif %}
         </div>
       </span>

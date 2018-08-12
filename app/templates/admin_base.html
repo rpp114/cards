@@ -27,7 +27,7 @@
     </div>
       <div class="navbar-dropdown">
         <a class="navbar-item" href="{{url_for('admin_companies')}}">Companies</a>
-        <a class="navbar-item" href="">Spending Categories</a>
+        <a class="navbar-item" href="{{url_for('admin_spending_categories')}}">Spending Categories</a>
       </div>
     </div>
     <div class="navbar-item has-dropdown is-hoverable">
@@ -35,8 +35,8 @@
       Reward Programs
     </div>
       <div class="navbar-dropdown">
-        <a class="navbar-item" href="">Reward Programs</a>
-        <a class="navbar-item" href="">Reward Categories</a>
+        <a class="navbar-item" href="{{url_for('admin_points_programs')}}">Reward Programs</a>
+        <a class="navbar-item" href="{{url_for('admin_reward_categories')}}">Reward Categories</a>
       </div>
     </div>
     <div class="navbar-item has-dropdown is-hoverable">
@@ -49,16 +49,16 @@
     </div>
     <span class="navbar-end">
     <div class="navbar-item">
-        <a href="{{ url_for('user_wallet') }}">Wallet</a>
+        <a class="has-text-black" href="{{ url_for('user_wallet') }}">Wallet</a>
     </div>
     <div class="navbar-item">
-        <a href="{{ url_for('logout') }}">Logout</a>
+        <a class="has-text-black" href="{{ url_for('logout') }}">Logout</a>
     </div>
   </span>
 
   </div>
 </div>
-<hr style="margin:.25rem 0 0 0" />
+<hr style="margin:.25rem 0 .25rem 0" />
 
         {% with messages = get_flashed_messages() %}
         {% if messages %}
