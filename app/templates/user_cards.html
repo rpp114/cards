@@ -51,12 +51,12 @@ function close_modal(){
         <div class="level-left">
         <div class="level-item">
 
-        <button class="button is-success" type="submit">Add to Wallet</button>
+        <button class="button is-success is-small" type="submit">Add to Wallet</button>
       </div>
       </div>
         <div class="level-right">
         <div class="level-item">
-          <button class="button is-light" id="cancel_button" type="button" onClick="close_modal()">Cancel</button>
+          <button class="button is-light is-small" id="cancel_button" type="button" onClick="close_modal()">Cancel</button>
       </div>
       </div>
       </span>
@@ -78,13 +78,13 @@ function close_modal(){
     </div>
     <div class="level-right">
       <div class="level-item">
-        <button class="button is-info" type="button" name="card_id" onclick="show_modal({'name': '{{suggested_card.name}}', 'id':'{{suggested_card.id}}'})">Add to Wallet</button>
+        <button class="button is-info  is-small" type="button" name="card_id" onclick="show_modal({'name': '{{suggested_card.name}}', 'id':'{{suggested_card.id}}'})">Add to Wallet</button>
       </div>
       <div class="level-item">
-        <button class="button is-light" onClick="location.href='/card?card_id={{suggested_card.id}}'" type="button">Card Details</button>
+        <button class="button is-light is-small" onClick="location.href='/card?card_id={{suggested_card.id}}'" type="button">Card Details</button>
       </div>
       <div class="level-item">
-        <button class="button is-success" type="button">Apply For Card</button>
+        <button class="button is-success is-small" type="button">Apply For Card</button>
       </div>
     </div>
   </div>
