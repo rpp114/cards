@@ -1,17 +1,131 @@
-{% extends "admin_base.html" %}
+{% extends "admin_base.html" %} {% block content %}
 
-{% block content %}
+<script>
+  $(document).ready(function() {
+    $('.repeat').each(function() {
+      $(this).repeatable_fields();
+      console.log(this);
+    })
+  })
+</script>
+
 <div class="content">
 
-  <h1>{{card.name}}</h1>
-  <p>Card Type: {{card.card_type|title}}</p>
-  <p>Points Program: {{card.points_program.name}}</p>
-  <p>Point Value: {{card.points_program.value}}</p>
-  <h3>Sign Up Bonus</h3>
-  <p>Points: {{reward.bonus_points}}</p>
-  <p>Min Spend: {{reward.minimum_spend}}</p>
-  <p>Days to Min Spend: {{reward.days_for_spend}}</p>
-  <h3>Spending Categories</h3>
+  <h1>{{company.name}}{% if not card %} New Card {% else %} {{card.name}}{% endif %}</h1>
+  <form class='form' action="" method="post">
+    {{form.hidden_tag()}}
+    <div class="field is-horizontal">
+      <div class="field-label">
+        <label class="label">{{form.name.label}}:</label>
+      </div>
+      <div class="field-body">
+        <div class="control">
+          {{form.name}}
+        </div>
+      </div>
+    </div>
+    <div class="field is-horizontal">
+      <div class="field-label">
+        <label class="label">{{form.card_type.label}}:</label>
+      </div>
+      <div class="field-body">
+        <div class="control">
+          <label class="radio">
+            {% if (card and card.card_type =='personal') or not card %}
+            <input type="radio" name="card_type" value="personal" checked/>
+            {% else %}
+            <input type="radio" name="card_type" value="personal"/>
+            {% endif %}
+              Personal
+          </label>
+          <label class="radio">
+              {% if card and card.card_type =='business' %}
+              <input type="radio" name="card_type" value="business" checked/>
+              {% else %}
+              <input type="radio" name="card_type" value="business"/>
+              {% endif %}
+              Business
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="field is-horizontal">
+      <div class="field-label">
+        <label class="label">{{form.points_program_id.label}}:</label>
+      </div>
+      <div class="field-body">
+        <div class="control">
+          {{form.points_program_id}}
+        </div>
+      </div>
+    </div>
+    <div class="field is-horizontal">
+      <div class="field-label">
+        <label class="label">{{form.apply_link_url.label}}:</label>
+      </div>
+      <div class="field-body">
+        <div class="control">
+          {{form.apply_link_url}}
+        </div>
+      </div>
+    </div>
+    <div class="field is-horizontal">
+      <div class="field-label">
+        <label class="label">{{form.terms_link_url.label}}:</label>
+      </div>
+      <div class="field-body">
+        <div class="control">
+          {{form.terms_link_url}}
+        </div>
+      </div>
+    </div>
+    <div class="field is-horizontal">
+      <div class="field-label">
+        <label class="label">{{form.image_file.label}}:</label>
+      </div>
+      <div class="field-body">
+        <div class="control">
+          {{form.image_file}}
+        </div>
+      </div>
+    </div>
+    <section class="section">
+    <div class="level container">
+      <div class="level-left">
+        <div class="level-item">
+          <h3>Sign Up Bonus</h3>
+        </div>
+        <div class="level-right">
+          <div class="level-item">
+            <button class="button is-small is-outlined is-success" type="button" onClick="location.href='{{url_for('admin_signup_bonuses', card_id=card.id)}}'">Add SignUp Bonus</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p>
+      Space for Signup Bonus
+    </p>
+  </section>
+  <section class="section">
+    <div class="level container">
+      <div class="level-left">
+        <div class="level-item">
+          <h3>Spending Categories</h3>
+        </div>
+        <div class="level-right">
+          <div class="level-item">
+            <button class="button is-small is-outlined is-info" type="button" onClick="location.href='{{url_for('admin_spending_categories', card_id=card.id)}}'">Edit Spending Catgories</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p>
+      Space for Signup Bonus
+    </p>
+  </section>
+
+    <button class="button is-success is-small" type="submit">Submit</button>
+  </form>
 
 </div>
 {% endblock %}

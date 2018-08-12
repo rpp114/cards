@@ -26,7 +26,17 @@
       Cards
     </div>
       <div class="navbar-dropdown">
-        <a class="navbar-item" href="{{url_for('admin_cards')}}">Cards</a>
+        <a class="navbar-item" href="{{url_for('admin_companies')}}">Companies</a>
+        <a class="navbar-item" href="">Spending Categories</a>
+      </div>
+    </div>
+    <div class="navbar-item has-dropdown is-hoverable">
+    <div class="navbar-item is-active">
+      Reward Programs
+    </div>
+      <div class="navbar-dropdown">
+        <a class="navbar-item" href="">Reward Programs</a>
+        <a class="navbar-item" href="">Reward Categories</a>
       </div>
     </div>
     <div class="navbar-item has-dropdown is-hoverable">
@@ -52,11 +62,11 @@
 
         {% with messages = get_flashed_messages() %}
         {% if messages %}
-        <ul>
             {% for message in messages %}
-            <li>{{ message }}</li>
+            <div class='notification is-primary'>
+              {{ message }}
+            </div>
             {% endfor %}
-        </ul>
         {% endif %}
         {% endwith %}
         {% block content %}{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+  <div class="content">
+    <div class="level">
+      <div class="level-left">
+        <span class="level-item"><h1>Companies</h1></span>
+        <span class="level-item"><button class="button is-primary" type="button" onClick="location.href='{{url_for('admin_company')}}'">Add New Company</button></span>
+      </div>
+    </div>
+    {% for company in companies %}
+    <div class="level">
+      <span class="level-left">
+        <div class="level-item">
+          <p>{{company.name}}</p>
+        </div>
+      </span>
+      <span class="level-right">
+        <div class="level-item">
+          <button class="button is-primary is-small" type="button" onClick="location.href='{{url_for('admin_company', company_id=company.id)}}'">Edit Company</button>
+        </div>
+        <div class="level-item">
+          <button class="button is-info is-outlined is-small" type="button" onClick="location.href='{{url_for('admin_cards', company_id=company.id)}}'">See Cards</button>
+        </div>
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+
+
+{% endblock %}

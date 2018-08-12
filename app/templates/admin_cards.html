@@ -1,23 +1,25 @@
-{% extends "admin_base.html" %}
-
-{% block content %}
-  <div class="content">
-    <h1>Cards</h1>
-    {% for card in cards %}
-    <div class="level">
-      <span class="level-right">
-        <div class="level-item">
-          <p>{{card.company.name + " | " + card.name}}</p>
-        </div>
-      </span>
-      <span class="level-left">
-        <div class="level-item">
-          <button class="button is-primary" type="button" onClick="location.href='{{url_for('admin_card', card_id=card.id)}}'">Edit Card</button>
-        </div>
-      </span>
+{% extends "admin_base.html" %} {% block content %}
+<div class="content">
+  <div class="level">
+    <div class="level-left">
+      <span class="level-item"><h1>{%if company%}{{company.name}} {%endif%}Cards</h1></span>
+      <span class="level-item"><button class="button is-primary" type="button" onClick="location.href='{{url_for('admin_card', company_id=company.id)}}'">Add New Card</button></span>
     </div>
-    {% endfor %}
   </div>
-  <button class="button is-primary" type="button" onClick="location.href='{{url_for('admin_card')}}'">Add New Card</button>
+  {% for card in cards %}
+  <div class="level">
+    <span class="level-left">
+        <div class="level-item">
+          <p>{{card.name}}</p>
+        </div>
+      </span>
+    <span class="level-right">
+        <div class="level-item">
+          <button class="button is-primary is-small" type="button" onClick="location.href='{{url_for('admin_card', card_id=card.id)}}'">Edit Card</button>
+        </div>
+      </span>
+  </div>
+  {% endfor %}
+</div>
 
 {% endblock %}
