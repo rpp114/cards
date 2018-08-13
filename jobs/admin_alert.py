@@ -31,6 +31,6 @@ def send_admin_email():
     -Ray
     """
 
-    msg = Message(subject=subject,body=body)
+    message = {'subject':subject,'body':body}
 
-    send_email(users, msg)
+    send_email(users, message)

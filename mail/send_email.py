@@ -20,14 +20,18 @@ def send_mail(users, message):
 
         recipient = [user.email]
 
-        msg.recipients = recipient
+        message['recipients'] = recipient
 
-        msq.subject = msg.subject.format(user.username)
+        message['subject'] = message['subject'].format(user.username)
 
         with app.app_context():
             with mail.connect() as conn:
 
-                    conn.send(msg)
+                msg = Message(recipients=message['recipients'],
+                              subject=message['subject'],
+                              body=message['body'])
+
+                conn.send(msg)
 
 
 # send_mail()
