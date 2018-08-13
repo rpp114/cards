@@ -33,4 +33,4 @@ def send_admin_email():
 
     message = {'subject':subject,'body':body}
 
-    send_email(users, message)
+    send_email.send_mail(users, message)
