@@ -76,9 +76,20 @@ def login():
 # Users Views
 ##############################################################
 
-@app.route('/user/wallet')
+@app.route('/user/wallet', methods=['GET', 'POST'])
 @login_required
 def user_wallet():
+
+	if request.method == 'POST':
+
+		if request.form.get('remove'):
+			card = models.Card.query.get(request.form.get('remove'))
+			current_user.remove_from_wallet(card)
+			flash('Removed {} from your wallet.'.format(card.name))
+		elif request.form.get('add'):
+			card = models.Card.query.get(request.form.get('add'))
+			current_user.add_to_wallet(card)
+			flash('Added {} from your wallet.'.format(card.name))
 
 	return render_template('user_wallet.html',user=current_user)
 
@@ -236,6 +247,11 @@ def admin_card():
 		card.card_type = data.get('card_type')
 		card.apply_link_url = data.get('apply_link_url')
 		card.terms_link_url = data.get('terms_link_url')
+		card.ulu = current_user.username
+
+		db.session.add(card)
+		db.session.commit()
+
 		file = request.files.get('image_file')
 		if file and allowed_file(file.filename):
 			file_type = '.' + file.filename.rsplit('.',1)[1].lower()
@@ -249,11 +265,11 @@ def admin_card():
 		db.session.add(card)
 		db.session.commit()
 
-		flash('Added {} to {}.'.format(card.name, card.company.name))
-
 		if new:
+			flash('Added {} to {}.'.format(card.name, card.company.name))
 			return redirect(url_for('admin_card', card_id=card.id))
 
+		flash('Updated {} {}.'.format(card.company.name, card.name))
 		return redirect(url_for('admin_cards', company_id=card.company_id))
 
 	form.points_program_id.choices = [(pp.id, pp.name) for pp in models.PointsProgram.query.filter_by(active=1).order_by(models.PointsProgram.name).all()]
@@ -304,6 +320,7 @@ def admin_card_spending_category():
 		if request.form.get('company_name', '') != '':
 			spending_category_lookup.company_name = request.form.get('company_name')
 		spending_category_lookup.earning_percent = request.form.get('earning_percent')
+		spending_category_lookup.ulu = current_user.username
 
 		db.session.add(spending_category_lookup)
 		db.session.commit()
@@ -350,6 +367,7 @@ def admin_spending_category():
 
 		spending_category = models.SpendingCategory() if not spending_category else spending_category
 		spending_category.name = request.form.get('name')
+		spending_category.ulu = current_user.username
 
 		db.session.add(spending_category)
 		db.session.commit()
@@ -391,6 +409,7 @@ def admin_signup_bonuses():
 		new_bonus.annual_fee = data.get('annual_fee')
 		new_bonus.annual_fee_waived = int(data.get('annual_fee_waived'))
 		new_bonus.bonus_points = data.get('bonus_points')
+		new_bonus.ulu = current_user.username
 
 		db.session.add(new_bonus)
 
@@ -443,6 +462,7 @@ def admin_reward_category():
 
 		reward_category = models.RewardCategory() if not reward_category else reward_category
 		reward_category.name = request.form.get('name')
+		reward_category.ulu = current_user.username
 
 		db.session.add(reward_category)
 		db.session.commit()
@@ -490,6 +510,7 @@ def admin_company():
 
 		company = models.Company() if not company else company
 		company.name = request.form.get('name')
+		company.ulu = current_user.username
 
 		db.session.add(company)
 		db.session.commit()
@@ -540,6 +561,7 @@ def admin_points_program():
 
 		program = models.PointsProgram() if not program else program
 		program.name = request.form.get('name')
+		program.ulu = current_user.username
 
 		db.session.add(program)
 		db.session.commit()
@@ -591,6 +613,7 @@ def admin_program_reward_category():
 		if request.form.get('company_name', '') != '':
 			reward_category_lookup.company_name = request.form.get('company_name')
 		reward_category_lookup.redeem_value = request.form.get('redeem_value')
+		reward_category_lookup.ulu = current_user.username
 
 		db.session.add(reward_category_lookup)
 		db.session.commit()

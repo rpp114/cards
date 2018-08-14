@@ -37,6 +37,16 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
+    def add_to_wallet(self, card):
+        self.cards.append(card)
+
+    def remove_from_wallet(self, card):
+        user_card = [card for card in self.user_cards if card.card_id == card.id][0]
+        user_card.active = 0
+        db.session.add(user_card)
+        db.session.commit()
+
+
 ####################################################
 #  Card and Company Definitions -- User Join to Cards
 ####################################################
@@ -63,6 +73,7 @@ class Card(db.Model):
     signup_bonuses = db.relationship('SignupBonus', backref='card', lazy='dynamic')
     spending_categories = db.relationship('SpendingCategory', backref='card', secondary='spending_category_lookup')
 
+
 class UserCardLookup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -71,8 +82,8 @@ class UserCardLookup(db.Model):
     expiration_date = db.Column(db.DATETIME)
     cancel_date = db.Column(db.DATETIME)
     active = db.Column(db.BOOLEAN(), default=1)
-    user_cards = db.relationship('Card', backref=db.backref('user_cards', cascade='all, delete-orphan'))
-    card_users = db.relationship('User', backref=db.backref('card_users', cascade='all, delete-orphan'))
+    user_cards = db.relationship('User', backref=db.backref('user_cards', cascade='all, delete-orphan'))
+    card_users = db.relationship('Card', backref=db.backref('card_users', cascade='all, delete-orphan'))
 
 ####################################################
 #  Points Programs and Sign Up Bonuses

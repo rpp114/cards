@@ -9,12 +9,12 @@
 
     $('.ui-accordion-header-active > button').removeClass('is-outlined').addClass('is-primary');
 
-    $('.button').on('click', function() {
+    $('.accordion-title').on('click', function() {
 
       if ($(this).hasClass('is-primary')) {
         $(this).addClass('is-outlined').removeClass('is-primary');
       } else {
-        $('.button').addClass('is-outlined').removeClass('is-primary');
+        $('.accordion-title').addClass('is-outlined').removeClass('is-primary');
         $(this).removeClass('is-outlined').addClass('is-primary');
       };
     });
@@ -25,7 +25,7 @@
   <h1>Welcome {{user.username}} this is your wallet</h1>
   <div id="accordion">
     <div>
-      <button type="button" class="button is-outlined is-fullwidth">
+      <button type="button" class="button accordion-title is-outlined is-fullwidth">
       <span>Optimized Wallet:</span>
       <span class="icon">
         <i class="fa fa-angle-down" aria-hidden="true"></i>
@@ -33,15 +33,17 @@
     </div>
     <span>
       <br />
-      {% for card in user.cards %}
+      <h3>Spot for Optimized wallet based on User Cards</h3>
+{#      {% for card in user.cards %}
         {% if card.active %}
           <h5><a href="{{ url_for('card_profile', card_id=card.id) }}">{{card.company.name}} - {{card.name}}</a></h5>
         {% endif %}
       {% endfor %}
+      #}
       <br />
     </span>
     <div>
-      <button type="button" class="button is-outlined is-fullwidth">
+      <button type="button" class="button accordion-title is-outlined is-fullwidth">
       <span>Current Cards:</span>
       <span class="icon">
         <i class="fa fa-angle-down" aria-hidden="true"></i>
@@ -49,15 +51,20 @@
     </div>
     <span>
       <br />
+      <form action="" method="post">
       {% for card in user.cards %}
         {% if card.active %}
-          <h5><a href="{{ url_for('card_profile', card_id=card.id) }}">{{card.company.name}} - {{card.name}}</a></h5>
+        <div class="level">
+          <span class="level-left"><h5 class="level-item title is-5">{{card.company.name}} - {{card.name}}</h5></span>
+          <span class="level-right"><button class="level-item button is-small is-danger" type="submit" name="remove" value="{{card.id}}">Remove</button></span>
+        </div>
         {% endif %}
       {% endfor %}
+    </form>
       <br />
     </span>
     <div>
-      <button type="button" class="button is-outlined is-fullwidth">
+      <button type="button" class="button accordion-title is-outlined is-fullwidth">
       <span>Suggested Cards:</span>
       <span class="icon">
         <i class="fa fa-angle-down" aria-hidden="true"></i>
@@ -65,15 +72,23 @@
     </div>
     <span>
       <br />
+      <form action="" method="post">
       {% for card in user.cards %}
         {% if card.active %}
-          <h5><a href="{{ url_for('card_profile', card_id=card.id) }}">{{card.company.name}} - {{card.name}}</a></h5>
+        <div class="level">
+          <span class="level-left"><h5 class="level-item title is-5">{{card.company.name}} - {{card.name}}</h5></span>
+          <span class="level-right">
+            <button class="level-item button is-small is-success" type="submit" name="add" value="{{card.id}}">Add To Wallet</button>
+            <button class="level-item button is-small is-light" type="button" onClick="location.href='{{url_for('card_profile',card_id=card.id)}}'">Card Info</button>
+          </span>
+        </div>
         {% endif %}
       {% endfor %}
+    </form>
       <br />
     </span>
     <div>
-      <button type="button" class="button is-outlined is-fullwidth">
+      <button type="button" class="button accordion-title is-outlined is-fullwidth">
         <span>Cancelled Cards:</span>
         <span class="icon">
           <i class="fa fa-angle-down" aria-hidden="true"></i>
@@ -81,6 +96,7 @@
       </div>
       <span>
         <br />
+        <h3> Spot for User cancelled cards</h3>
           {% for card in user.cards %}
           {% if not card.active %}
           <h5><a href="{{ url_for('card_profile', card_id=card.id) }}">{{card.company.name}} - {{card.name}}</a></h5>
