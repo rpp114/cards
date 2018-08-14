@@ -72,19 +72,39 @@
     </div>
     <span>
       <br />
-      <form action="" method="post">
       {% for card in user.cards %}
         {% if card.active %}
         <div class="level">
           <span class="level-left"><h5 class="level-item title is-5">{{card.company.name}} - {{card.name}}</h5></span>
           <span class="level-right">
-            <button class="level-item button is-small is-success" type="submit" name="add" value="{{card.id}}">Add To Wallet</button>
+            <button class="level-item button is-small is-success" type="button" onClick="location.href='{{card.apply_link_url}}'">Apply For Card</button>
             <button class="level-item button is-small is-light" type="button" onClick="location.href='{{url_for('card_profile',card_id=card.id)}}'">Card Info</button>
           </span>
         </div>
         {% endif %}
       {% endfor %}
-    </form>
+      <br />
+    </span>
+    <div>
+      <button type="button" class="button accordion-title is-outlined is-fullwidth">
+      <span>Applied for Cards:</span>
+      <span class="icon">
+        <i class="fa fa-angle-down" aria-hidden="true"></i>
+      </span>
+    </div>
+    <span>
+      <br />
+      <h3> Spot for Applied For Cards</h3>
+      {#{% for card in user.cards %}
+        {% if card.active %}
+        <div class="level">
+          <span class="level-left"><h5 class="level-item title is-5">{{card.company.name}} - {{card.name}}</h5></span>
+          <span class="level-right">
+            <button class="level-item button is-small is-success" type="submit" name="add" value="{{card.id}}">Add To Wallet</button>
+          </span>
+        </div>
+        {% endif %}
+      {% endfor %}#}
       <br />
     </span>
     <div>
