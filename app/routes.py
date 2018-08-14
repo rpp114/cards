@@ -31,7 +31,7 @@ def logout():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
 	if current_user.is_authenticated:
-		return redirect(url_for('user_cards'))
+		return redirect(url_for('user_wallet'))
 
 	form = SignupForm()
 
@@ -53,7 +53,7 @@ def signup():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 	if current_user.is_authenticated:
-		return redirect(url_for('user_cards'))
+		return redirect(url_for('user_wallet'))
 
 	form = LoginForm()
 
