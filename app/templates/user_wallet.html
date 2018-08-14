@@ -1,11 +1,94 @@
-{% extends "internal_base.html" %}
+{% extends "internal_base.html" %} {% block content %}
 
-{% block content %}
+<script>
+  $(document).ready(function() {
+    $('#accordion').accordion({
+      collapsible: true,
+      animate: 100
+    });
+
+    $('.ui-accordion-header-active > button').removeClass('is-outlined').addClass('is-primary');
+
+    $('.button').on('click', function() {
+
+      if ($(this).hasClass('is-primary')) {
+        $(this).addClass('is-outlined').removeClass('is-primary');
+      } else {
+        $('.button').addClass('is-outlined').removeClass('is-primary');
+        $(this).removeClass('is-outlined').addClass('is-primary');
+      };
+    });
+  })
+</script>
+
 <div class="content">
-  <h1>This is your wallet</h1>
-  {% for card in user.cards %}
-    <h5><a href="{{ url_for('card_profile', card_id=card.id) }}">{{card.company.name}} - {{card.name}}</a></h5>
-  {% endfor %}
+  <h1>Welcome {{user.username}} this is your wallet</h1>
+  <div id="accordion">
+    <div>
+      <button type="button" class="button is-outlined is-fullwidth">
+      <span>Optimized Wallet:</span>
+      <span class="icon">
+        <i class="fa fa-angle-down" aria-hidden="true"></i>
+      </span>
+    </div>
+    <span>
+      <br />
+      {% for card in user.cards %}
+        {% if card.active %}
+          <h5><a href="{{ url_for('card_profile', card_id=card.id) }}">{{card.company.name}} - {{card.name}}</a></h5>
+        {% endif %}
+      {% endfor %}
+      <br />
+    </span>
+    <div>
+      <button type="button" class="button is-outlined is-fullwidth">
+      <span>Current Cards:</span>
+      <span class="icon">
+        <i class="fa fa-angle-down" aria-hidden="true"></i>
+      </span>
+    </div>
+    <span>
+      <br />
+      {% for card in user.cards %}
+        {% if card.active %}
+          <h5><a href="{{ url_for('card_profile', card_id=card.id) }}">{{card.company.name}} - {{card.name}}</a></h5>
+        {% endif %}
+      {% endfor %}
+      <br />
+    </span>
+    <div>
+      <button type="button" class="button is-outlined is-fullwidth">
+      <span>Suggested Cards:</span>
+      <span class="icon">
+        <i class="fa fa-angle-down" aria-hidden="true"></i>
+      </span>
+    </div>
+    <span>
+      <br />
+      {% for card in user.cards %}
+        {% if card.active %}
+          <h5><a href="{{ url_for('card_profile', card_id=card.id) }}">{{card.company.name}} - {{card.name}}</a></h5>
+        {% endif %}
+      {% endfor %}
+      <br />
+    </span>
+    <div>
+      <button type="button" class="button is-outlined is-fullwidth">
+        <span>Cancelled Cards:</span>
+        <span class="icon">
+          <i class="fa fa-angle-down" aria-hidden="true"></i>
+        </span>
+      </div>
+      <span>
+        <br />
+          {% for card in user.cards %}
+          {% if not card.active %}
+          <h5><a href="{{ url_for('card_profile', card_id=card.id) }}">{{card.company.name}} - {{card.name}}</a></h5>
+          {% endif %}
+          {% endfor %}
+        <br />
+      </span>
+    <div>
+  </div>
 </div>
-
 {% endblock %}

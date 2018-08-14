@@ -1,8 +1,12 @@
+import datetime, os
 from flask import render_template, flash, url_for, redirect, request
 from app import app, db, models
 from app.forms import LoginForm, CardForm, SignupForm, CompanyForm, SignupBonusForm,PointsProgramForm, RewardCategoryForm, ProgramRewardCategoryForm,SpendingCategoryForm,CardSpendingCategoryForm
 from flask_login import current_user, login_user, login_required, logout_user
-import datetime
+from werkzeug.utils import secure_filename
+
+def allowed_file(filename):
+	return '.' in filename and filename.rsplit('.',1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 @app.route('/')
 @app.route('/index')
@@ -219,6 +223,7 @@ def admin_card():
 		form.company_id.data = company_id
 
 	if request.method == 'POST':
+
 		data = request.form
 		new= False
 		if not card:
@@ -231,6 +236,15 @@ def admin_card():
 		card.card_type = data.get('card_type')
 		card.apply_link_url = data.get('apply_link_url')
 		card.terms_link_url = data.get('terms_link_url')
+		file = request.files.get('image_file')
+		if file and allowed_file(file.filename):
+			file_type = '.' + file.filename.rsplit('.',1)[1].lower()
+			image_filename = 'card_' + str(card.id) + file_type
+			filename = secure_filename(image_filename)
+			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+			card.image_file = image_filename
+		elif file and not allowed_file(file.filename):
+			flash('File not approved file type. Please try again.')
 
 		db.session.add(card)
 		db.session.commit()
