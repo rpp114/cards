@@ -12,7 +12,7 @@ def allowed_file(filename):
 @app.route('/index')
 def index():
 	if current_user.is_authenticated:
-		return redirect(url_for('user_cards'))
+		return redirect(url_for('user_wallet'))
 
 	title = 'Travel Hacker'
 
