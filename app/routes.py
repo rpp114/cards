@@ -1,7 +1,7 @@
 import datetime, os
 from flask import render_template, flash, url_for, redirect, request
 from app import app, db, models
-from app.forms import LoginForm, CardForm, SignupForm, CompanyForm, SignupBonusForm,PointsProgramForm, RewardCategoryForm, ProgramRewardCategoryForm,SpendingCategoryForm,CardSpendingCategoryForm
+from app.forms import LoginForm, CardForm, SignupForm, CompanyForm, SignupBonusForm,PointsProgramForm, RewardCategoryForm, ProgramRewardCategoryForm,SpendingCategoryForm,CardSpendingCategoryForm,UserCardForm
 from flask_login import current_user, login_user, login_required, logout_user
 from werkzeug.utils import secure_filename
 
@@ -87,6 +87,7 @@ def user_wallet():
 			user_card_lookup = models.UserCardLookup.query.filter_by(card_id = card_id, user_id = current_user.id).first()
 			user_card_lookup.active = 0
 			user_card_lookup.status = 'inactive'
+			user_card_lookup.cancel_date = datetime.datetime.now()
 			flash('Removed card from your wallet.')
 		elif request.form.get('add'):
 			card_id = request.form.get('add')
@@ -125,15 +126,21 @@ def user_wallet():
 
 	return render_template('user_wallet.html',user=current_user, cards=cards, wallet=wallet)
 
+@app.route('/user/card')
+@login_required
+def user_card():
+
+	return render_template('user_profile.html')
+
 @app.route('/user/profile')
 @login_required
 def user_profile():
 
 	return render_template('user_profile.html')
 
-@app.route('/user/cards', methods=['GET', 'POST'])
+@app.route('/search/cards', methods=['GET', 'POST'])
 @login_required
-def user_cards():
+def search_cards():
 
 	if request.method == 'POST':
 
@@ -161,7 +168,7 @@ def user_cards():
 # Card Views
 ##############################################################
 
-@app.route('/card')
+@app.route('/card/profile')
 @login_required
 def card_profile():
 	card_id = request.args.get('card_id')

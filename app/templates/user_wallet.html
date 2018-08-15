@@ -43,7 +43,7 @@
     </span>
     <div>
       <button type="button" class="button accordion-title is-outlined is-fullwidth">
-      <span>Current Cards:</span>
+      <span>Current Cards ({{cards['active']|length}}):</span>
       <span class="icon">
         <i class="fa fa-angle-down" aria-hidden="true"></i>
       </span>
@@ -54,7 +54,10 @@
       {% for card in cards['active'] %}
         <div class="level">
           <span class="level-left"><h5 class="level-item title is-5">{{card.company.name}} - {{card.name}}</h5></span>
-          <span class="level-right"><button class="level-item button is-small is-danger" type="submit" name="remove" value="{{card.id}}">Remove</button></span>
+          <span class="level-right">
+              <button class="level-item button is-small is-info" type="submit" name="apply" value="{{card.id}}" onClick="window.open('{{url_for('user_card', card_id=card.id)}}', '_blank')">Edit Card Info</button>
+            <button class="level-item button is-small is-danger is-outlined" type="submit" name="remove" value="{{card.id}}">Remove</button>
+          </span>
     </div>
     {% endfor %}
     </form>
@@ -62,7 +65,7 @@
     </span>
     <div>
       <button type="button" class="button accordion-title is-outlined is-fullwidth">
-      <span>Suggested Cards:</span>
+      <span>Suggested Cards ({{cards['suggested']|length}}):</span>
       <span class="icon">
         <i class="fa fa-angle-down" aria-hidden="true"></i>
       </span>
@@ -74,8 +77,8 @@
         <div class="level">
           <span class="level-left"><h5 class="level-item title is-5">{{card.company.name}} - {{card.name}}</h5></span>
           <span class="level-right">
-            <button class="level-item button is-small is-success" type="submit" name="apply" value="{{card.id}}" onClick="window.open('{{card.apply_link_url}}', '_blank')">Apply For Card</button>
-      <button class="level-item button is-small is-light" type="button" onClick="window.open('{{url_for('card_profile',card_id=card.id)}}', '_blank')">Card Info</button>
+      <button class="level-item button is-small is-info" type="button" onClick="window.open('{{url_for('card_profile',card_id=card.id)}}', '_blank')">Card Details</button>
+      <button class="level-item button is-small is-success is-outlined" type="submit" name="apply" value="{{card.id}}" onClick="window.open('{{card.apply_link_url}}', '_blank')">Apply For Card</button>
       </span>
     </div>
     {% endfor %}
@@ -84,7 +87,7 @@
     </span>
     <div>
       <button type="button" class="button accordion-title is-outlined is-fullwidth">
-      <span>Applied for Cards:</span>
+      <span>Applied for Cards ({{cards['applied']|length}}):</span>
       <span class="icon">
         <i class="fa fa-angle-down" aria-hidden="true"></i>
       </span>
@@ -103,7 +106,7 @@
     </span>
     <div>
       <button type="button" class="button accordion-title is-outlined is-fullwidth">
-        <span>Cancelled Cards:</span>
+        <span>Cancelled Cards ({{cards['inactive']|length}}):</span>
         <span class="icon">
           <i class="fa fa-angle-down" aria-hidden="true"></i>
         </span>
@@ -115,8 +118,8 @@
         <div class="level">
           <span class="level-left"><h5 class="level-item title is-5">{{card.company.name}} - {{card.name}}</h5></span>
           <span class="level-right">
-            <button class="level-item button is-small is-success" type="submit" name="apply" value="{{card.id}}" onClick="window.open('{{card.apply_link_url}}', '_blank')">Apply For Card</button>
-      <button class="level-item button is-small is-light" type="button" onClick="window.open('{{url_for('card_profile',card_id=card.id)}}', '_blank')">Card Info</button> </span>
+            <button class="level-item button is-small is-info" type="button" onClick="window.open('{{url_for('card_profile',card_id=card.id)}}', '_blank')">Card Details</button>
+            <button class="level-item button is-small is-success is-outlined" type="submit" name="apply" value="{{card.id}}" onClick="window.open('{{card.apply_link_url}}', '_blank')">Apply For Card</button> </span>
     </div>
     {% endfor %}
       <br />

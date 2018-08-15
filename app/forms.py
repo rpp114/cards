@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, FileField, RadioField, HiddenField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, FileField, RadioField, HiddenField, DateField
 from wtforms.validators import DataRequired, Email, ValidationError, EqualTo
 from app.models import User, Company, Card, PointsProgram, RewardCategory, SpendingCategory
 
@@ -67,3 +67,10 @@ class CardSpendingCategoryForm(FlaskForm):
     spending_category_id = SelectField('Spending Category Name')
     company_name = StringField('Spending Company Name')
     earning_percent = StringField('Earning Percent')
+
+class UserCardForm(FlaskForm):
+    card_id = HiddenField()
+    user_id = HiddenField()
+    active_date = DateField('Activation Date')
+    expiration_date = DateField('Expiration Date')
+    cancel_date = DateField('Cancel Date')
