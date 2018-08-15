@@ -37,15 +37,6 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
-    def add_to_wallet(self, card):
-        self.cards.append(card)
-
-    def remove_from_wallet(self, card):
-        user_card = [card for card in self.user_cards if card.card_id == card.id][0]
-        user_card.active = 0
-        db.session.add(user_card)
-        db.session.commit()
-
 
 ####################################################
 #  Card and Company Definitions -- User Join to Cards
@@ -82,6 +73,7 @@ class UserCardLookup(db.Model):
     expiration_date = db.Column(db.DATETIME)
     cancel_date = db.Column(db.DATETIME)
     active = db.Column(db.BOOLEAN(), default=1)
+    status = db.Column(db.VARCHAR(10), default='active')
     user_cards = db.relationship('User', backref=db.backref('user_cards', cascade='all, delete-orphan'))
     card_users = db.relationship('Card', backref=db.backref('card_users', cascade='all, delete-orphan'))
 

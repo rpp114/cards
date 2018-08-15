@@ -83,15 +83,47 @@ def user_wallet():
 	if request.method == 'POST':
 
 		if request.form.get('remove'):
-			card = models.Card.query.get(request.form.get('remove'))
-			current_user.remove_from_wallet(card)
-			flash('Removed {} from your wallet.'.format(card.name))
+			card_id = request.form.get('remove')
+			user_card_lookup = models.UserCardLookup.query.filter_by(card_id = card_id, user_id = current_user.id).first()
+			user_card_lookup.active = 0
+			user_card_lookup.status = 'inactive'
+			flash('Removed card from your wallet.')
 		elif request.form.get('add'):
-			card = models.Card.query.get(request.form.get('add'))
-			current_user.add_to_wallet(card)
-			flash('Added {} from your wallet.'.format(card.name))
+			card_id = request.form.get('add')
+			user_card_lookup = models.UserCardLookup.query.filter_by(card_id=card_id, user_id = current_user.id).first()
+			if not user_card_lookup:
+				user_card_lookup = models.UserCardLookup(card_id=card_id, user_id=current_user.id)
+			user_card_lookup.active = 1
+			user_card_lookup.status = 'active'
+			flash('Added card to your wallet.')
+		elif request.form.get('apply'):
+			card_id = request.form.get('apply')
+			user_card_lookup = models.UserCardLookup.query.filter_by(card_id=card_id, user_id = current_user.id).first()
+			if not user_card_lookup:
+				user_card_lookup = models.UserCardLookup(card_id=card_id, user_id=current_user.id)
+			user_card_lookup.active = 1
+			user_card_lookup.status = 'applied'
+			flash('Applied for card.')
 
-	return render_template('user_wallet.html',user=current_user)
+		db.session.add(user_card_lookup)
+		db.session.commit()
+
+	user_cards = models.Card.query\
+			.join(models.UserCardLookup, models.Company)\
+			.add_columns(models.Company.name, models.UserCardLookup.active, models.UserCardLookup.status)\
+			.filter(models.UserCardLookup.user_id == current_user.id, models.Card.active == 1, models.Company.active == 1)\
+			.order_by(models.Company.name, models.Card.name).all()
+
+	cards = {}
+	for user_card in user_cards:
+		cards[user_card[3]] = cards.get(user_card[3], [])
+		cards[user_card[3]].append(user_card[0])
+
+	cards['suggested'] = cards['active']
+
+	wallet = {'travel':[]}
+
+	return render_template('user_wallet.html',user=current_user, cards=cards, wallet=wallet)
 
 @app.route('/user/profile')
 @login_required
