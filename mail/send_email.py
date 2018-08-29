@@ -20,7 +20,11 @@ def send_mail(messages):
         with mail.connect() as conn:
 
             for msg in messages:
-                conn.send(msg)
+                m = Message(recipients=msg['recipient'],
+                            subject=msg['subject'],
+                            body=msg['body'])
+
+                conn.send(m)
 
 
 # send_mail()
