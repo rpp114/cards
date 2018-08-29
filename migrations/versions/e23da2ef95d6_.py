@@ -21,7 +21,7 @@ def upgrade():
     op.create_table('reward_program',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('category_name', sa.VARCHAR(length=255), nullable=True),
-    sa.Column('program_name', sa.VARCHAR(length=256), nullable=True),
+    sa.Column('program_name', sa.VARCHAR(length=255), nullable=True),
     sa.Column('company_name', sa.VARCHAR(length=255), nullable=True),
     sa.Column('redeem_value', sa.Float(), nullable=True),
     sa.Column('active', sa.BOOLEAN(), nullable=True),
