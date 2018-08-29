@@ -87,7 +87,7 @@ class PointsProgram(db.Model):
     active = db.Column(db.BOOLEAN(), default=1)
     ulu = db.Column(db.VARCHAR(50))
     cards = db.relationship('Card', backref='points_program', lazy='dynamic')
-    reward_categories = db.relationship('RewardCategory', backref='points_program', secondary='reward_category_lookup')
+    reward_programs = db.relationship('RewardProgram', backref='points_program', secondary='reward_program_lookup')
 
 
 class SignupBonus(db.Model):
@@ -107,23 +107,24 @@ class SignupBonus(db.Model):
 #  Spending and Reward Category Info
 ####################################################
 
-class RewardCategory(db.Model):
+class RewardProgram(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.VARCHAR(256), unique=True)
-    active = db.Column(db.BOOLEAN(), default=1)
-    ulu = db.Column(db.VARCHAR(50))
-    programs = db.relationship('PointsProgram', backref = 'reward_category', secondary='reward_category_lookup')
-
-class RewardCategoryLookup(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    points_program_id = db.Column(db.Integer, db.ForeignKey('points_program.id'))
-    reward_category_id = db.Column(db.Integer, db.ForeignKey('reward_category.id'))
-    company_name = db.Column(db.VARCHAR(255), default="All")
+    category_name = db.Column(db.VARCHAR(255))
+    program_name = db.Column(db.VARCHAR(256), unique=True)
+    company_name = db.Column(db.VARCHAR(255))
     redeem_value = db.Column(db.Float)
     active = db.Column(db.BOOLEAN(), default=1)
     ulu = db.Column(db.VARCHAR(50))
-    programs = db.relationship('PointsProgram', backref=db.backref('points_program_reward_categories', cascade='all, delete-orphan'))
-    reward_categories = db.relationship('RewardCategory', backref=db.backref('reward_category_points_programs', cascade='all, delete-orphan'))
+    points_programs = db.relationship('PointsProgram', backref = 'reward_program', secondary='reward_program_lookup')
+
+class RewardProgramLookup(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    points_program_id = db.Column(db.Integer, db.ForeignKey('points_program.id'))
+    reward_program_id = db.Column(db.Integer, db.ForeignKey('reward_program.id'))
+    active = db.Column(db.BOOLEAN(), default=1)
+    ulu = db.Column(db.VARCHAR(50))
+    programs = db.relationship('PointsProgram', backref=db.backref('points_program_reward_programs', cascade='all, delete-orphan'))
+    reward_programs = db.relationship('RewardProgram', backref=db.backref('reward_program_points_programs', cascade='all, delete-orphan'))
 
 class SpendingCategory(db.Model):
     id = db.Column(db.Integer, primary_key=True)

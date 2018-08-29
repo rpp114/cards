@@ -1,7 +1,7 @@
 import datetime, os
 from flask import render_template, flash, url_for, redirect, request
 from app import app, db, models
-from app.forms import LoginForm, CardForm, SignupForm, CompanyForm, SignupBonusForm,PointsProgramForm, RewardCategoryForm, ProgramRewardCategoryForm,SpendingCategoryForm,CardSpendingCategoryForm,UserCardForm
+from app.forms import LoginForm, CardForm, SignupForm, CompanyForm, SignupBonusForm,PointsProgramForm, RewardCategoryForm, RewardProgramForm,SpendingCategoryForm,CardSpendingCategoryForm,UserCardForm
 from flask_login import current_user, login_user, login_required, logout_user
 from werkzeug.utils import secure_filename
 
@@ -88,7 +88,9 @@ def user_wallet():
 			user_card_lookup.active = 0
 			user_card_lookup.status = 'inactive'
 			user_card_lookup.cancel_date = datetime.datetime.now()
-			flash('Removed card from your wallet.')
+
+			message = 'Removed {} from your wallet.'
+
 		elif request.form.get('add'):
 			card_id = request.form.get('add')
 			user_card_lookup = models.UserCardLookup.query.filter_by(card_id=card_id, user_id = current_user.id).first()
@@ -96,7 +98,9 @@ def user_wallet():
 				user_card_lookup = models.UserCardLookup(card_id=card_id, user_id=current_user.id)
 			user_card_lookup.active = 1
 			user_card_lookup.status = 'active'
-			flash('Added card to your wallet.')
+
+			message = 'Added {} to your wallet.'
+			
 		elif request.form.get('apply'):
 			card_id = request.form.get('apply')
 			user_card_lookup = models.UserCardLookup.query.filter_by(card_id=card_id, user_id = current_user.id).first()
@@ -104,7 +108,12 @@ def user_wallet():
 				user_card_lookup = models.UserCardLookup(card_id=card_id, user_id=current_user.id)
 			user_card_lookup.active = 1
 			user_card_lookup.status = 'applied'
-			flash('Applied for card.')
+
+			message = 'Applied for {}.'
+
+		card = models.Card.query.get(card_id)
+
+		flash(message.format(card.name))
 
 		db.session.add(user_card_lookup)
 		db.session.commit()
@@ -120,7 +129,7 @@ def user_wallet():
 		cards[user_card[3]] = cards.get(user_card[3], [])
 		cards[user_card[3]].append(user_card[0])
 
-	cards['suggested'] = cards['active']
+	# cards['suggested'] = cards['active']
 
 	wallet = {'travel':[]}
 
@@ -155,13 +164,21 @@ def search_cards():
 		card = models.Card.query.get(request.form.get('card_id'))
 		flash('Added {} to your wallet'.format(card.name))
 
-	cards = models.Card.query.all()
+	all_cards = models.Card.query.all()
 
+	cards = {'companies': []}
 
-	# Needs Algo to Suggest Card
-	suggested_card = models.Card.query.get(1)
+	for card in all_cards:
+		if card in current_user.cards:
+			continue
+		if card.company.name not in cards['companies']:
+			cards['companies'].append(card.company.name)
+		cards[card.company.name] = cards.get(card.company.name, {'business':[],'personal':[]})
+		cards[card.company.name][card.card_type].append(card)
 
-	return render_template('user_cards.html', cards=cards, suggested_card = suggested_card, user_cards = current_user.cards)
+	cards['companies'] = sorted(cards['companies'], key=lambda x:x.lower())
+
+	return render_template('user_cards.html', cards=cards)
 
 
 ##############################################################
@@ -468,49 +485,74 @@ def admin_signup_bonuses():
 
 	return render_template('admin_signup_bonuses.html', card=card, signup_bonus=signup_bonus, form=form)
 
-@app.route('/admin/reward_categories', methods=['GET','POST'])
+@app.route('/admin/reward_programs', methods=['GET','POST'])
 @login_required
-def admin_reward_categories():
+def admin_reward_programs():
 	if not current_user.admin:
 		return redirect(url_for('index'))
 
-	categories = models.RewardCategory.query.filter_by(active=1).order_by(models.RewardCategory.name).all()
+	reward_programs = models.RewardProgram.query.filter_by(active=1).order_by(models.RewardProgram.category_name, models.RewardProgram.program_name).all()
 
-	return render_template('admin_reward_categories.html', categories=categories)
+	programs = {'categories': []}
 
-@app.route('/admin/reward_category', methods=['GET', 'POST'])
+	for rp in reward_programs:
+		if rp.category_name not in programs['categories']:
+			programs['categories'].append(rp.category_name)
+		programs[rp.category_name] = programs.get(rp.category_name, [])
+		programs[rp.category_name].append(rp)
+
+
+
+
+	return render_template('admin_reward_programs.html', programs=programs)
+
+@app.route('/admin/reward_program', methods=['GET', 'POST'])
 @login_required
-def admin_reward_category():
+def admin_reward_program():
 	if not current_user.admin:
 		return redirect(url_for('index'))
 
-	reward_category_id = request.args.get('reward_category_id')
+	reward_program_id = request.args.get('reward_program_id')
 
-	reward_category = None
-	form = RewardCategoryForm()
+	reward_program = None
+	form = RewardProgramForm()
 
-	if reward_category_id:
-		reward_category = models.RewardCategory.query.get(reward_category_id)
-		form = RewardCategoryForm(obj=reward_category)
+	if reward_program_id:
+		reward_program = models.RewardProgram.query.get(reward_program_id)
+		form = RewardProgramForm(obj=reward_program)
 
 	if request.method == 'POST':
-		if reward_category == None:
-			message = 'Added New Reward Category {}'
+		if reward_program == None:
+			message = 'Added New Reward Program {}'
 		else:
-			message = 'Updated Reward Category {}'
+			message = 'Updated Reward Program {}'
 
-		reward_category = models.RewardCategory() if not reward_category else reward_category
-		reward_category.name = request.form.get('name')
-		reward_category.ulu = current_user.username
+		reward_program = models.RewardProgram() if not reward_program else reward_program
 
-		db.session.add(reward_category)
+		new_cat = request.form.get('new_category_name', '')
+
+		if new_cat != '':
+			reward_program.category_name = new_cat
+		else:
+			reward_program.category_name = request.form.get('category_name')
+		reward_program.program_name = request.form.get('program_name')
+		reward_program.company_name = request.form.get('company_name')
+		reward_program.redeem_value = request.form.get('redeem_value')
+
+		reward_program.ulu = current_user.username
+
+		db.session.add(reward_program)
 		db.session.commit()
 
-		flash(message.format(reward_category.name))
+		flash(message.format(reward_program.program_name))
 
-		return redirect(url_for('admin_reward_categories'))
+		return redirect(url_for('admin_reward_programs'))
 
-	return render_template('admin_reward_category.html', form=form, reward_category=reward_category)
+	categories  = db.session.query(models.RewardProgram.category_name).distinct().order_by(models.RewardProgram.category_name).all()
+
+	form.category_name.choices = [(c[0], c[0]) for c in categories]
+
+	return render_template('admin_reward_program.html', form=form, reward_program=reward_program)
 
 ######################################################################
 #  Views for Admin of Companies
@@ -591,6 +633,7 @@ def admin_points_program():
 		form = PointsProgramForm(obj=program)
 
 	if request.method == 'POST':
+
 		if program == None:
 			message = 'Added New Program {}'
 			new = True
@@ -605,66 +648,28 @@ def admin_points_program():
 		db.session.add(program)
 		db.session.commit()
 
-		flash(message.format(program.name))
+		message = message.format(program.name)
 
-		if new:
-			return redirect(url_for('admin_points_program', program_id=program.id))
+		add_reward_program_id = request.form.get('add_reward_program_id', '')
+		delete_reward_program_id = request.form.get('delete_reward_program_id', '')
 
-		return redirect(url_for('admin_points_programs'))
-
-	reward_categories = []
-
-	if program:
-		reward_categories = models.RewardCategory.query\
-			.join(models.RewardCategoryLookup,models.RewardCategory.id==models.RewardCategoryLookup.reward_category_id)\
-			.add_columns(models.RewardCategoryLookup.id, models.RewardCategory.name, models.RewardCategoryLookup.company_name, models.RewardCategoryLookup.redeem_value)\
-			.filter(models.RewardCategoryLookup.points_program_id == program.id, models.RewardCategory.active == 1, models.RewardCategoryLookup.active == 1)\
-			.order_by(models.RewardCategory.name, models.RewardCategoryLookup.redeem_value.desc()).all()
-
-	print('reward_category:', reward_categories)
-
-	return render_template('admin_points_program.html', form=form, program=program, reward_categories=reward_categories)
-
-@app.route('/admin/points_program/reward_category', methods=['GET', 'POST'])
-@login_required
-def admin_program_reward_category():
-	if not current_user.admin:
-		return redirect(url_for('index'))
-
-	program_id = request.args.get('program_id')
-	program_category_id = request.args.get('program_category_id')
-
-	program = models.PointsProgram.query.get(program_id)
-
-	reward_category_lookup = None
-	form = ProgramRewardCategoryForm(points_program_id=program_id)
-
-	if program_category_id:
-		reward_category_lookup = models.RewardCategoryLookup.query.get(program_category_id)
-		form = ProgramRewardCategoryForm(obj=reward_category_lookup)
-
-	if request.method == 'POST':
-
-		reward_category_lookup = models.RewardCategoryLookup() if not reward_category_lookup else reward_category_lookup
 		print(request.form)
-		reward_category_lookup.points_program_id = request.form.get('points_program_id')
-		reward_category_lookup.reward_category_id = request.form.get('reward_category_id')
-		if request.form.get('company_name', '') != '':
-			reward_category_lookup.company_name = request.form.get('company_name')
-		reward_category_lookup.redeem_value = request.form.get('redeem_value')
-		reward_category_lookup.ulu = current_user.username
 
-		db.session.add(reward_category_lookup)
+		if add_reward_program_id != '':
+			reward_program = models.RewardProgram.query.get(add_reward_program_id)
+			program.reward_programs.append(reward_program)
+			message = 'Added {} to {}'.format(reward_program.program_name, program.name)
+
+		if delete_reward_program_id != '':
+			reward_program = models.RewardProgram.query.get(delete_reward_program_id)
+			program.reward_programs.remove(reward_program)
+			message = 'Removed {} from {}'.format(reward_program.program_name, program.name)
+
+		db.session.add(program)
 		db.session.commit()
 
-		print('lookup:',reward_category_lookup)
+		flash(message)
 
-		# flash(message.format(spending_category.name))
+	reward_programs = models.RewardProgram.query.order_by(models.RewardProgram.program_name).all()
 
-		return redirect(url_for('admin_points_program', program_id=program_id))
-
-	form.reward_category_id.choices = [(rc.id, rc.name) for rc in models.RewardCategory.query.filter_by(active=1).order_by(models.RewardCategory.name).all()]
-
-	form.points_program_id.data = program_id
-
-	return render_template('admin_program_reward_category.html', form=form, lookup=reward_category_lookup, program=program)
+	return render_template('admin_points_program.html', form=form, program=program, reward_programs=reward_programs)

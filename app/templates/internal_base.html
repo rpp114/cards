@@ -15,11 +15,25 @@
     <div class="navbar-item is-hoverable">
       <a class="has-text-black" href="{{url_for('user_wallet') }}">Wallet</a>
     </div>
-    <div class="navbar-item is-hoverable">
-      <a class="has-text-black" href="{{url_for('search_cards') }}">Search Cards</a>
+    <div class="navbar-item has-dropdown is-hoverable">
+    <div class="navbar-item is-active">
+      Cards
     </div>
-    <div class="navbar-item is-hoverable">
-      <a class="has-text-black" href="{{ url_for('user_profile') }}">Profile</a>
+      <div class="navbar-dropdown">
+        <a class="navbar-item" href="{{url_for('search_cards')}}">Search Cards</a>
+        <a class="navbar-item" href="">Points Programs</a>
+        <a class="navbar-item" href="">Rewards Programs</a>
+      </div>
+    </div>
+    <div class="navbar-item has-dropdown is-hoverable">
+    <div class="navbar-item is-active">
+      Profile
+    </div>
+      <div class="navbar-dropdown">
+        <a class="navbar-item" href="">Notifications</a>
+        <a class="navbar-item" href="{{ url_for('user_profile') }}">Profile</a>
+        <a class="navbar-item" href="">Submitted Suggestions</a>
+      </div>
     </div>
     <div class="navbar-item is-hoverable">
       <a class="has-text-black" href="{{ url_for('user_profile') }}">Articles</a>

@@ -9,28 +9,52 @@ from app import db, models, mail, app
 from mail import send_email
 
 
+def get_min_spend_users():
+
+    get_users_query = """select user.id, user.email, user.username, company.name, card.name, date(l.active_date + interval s.days_for_spend day) as min_spend_date, datediff(l.active_date + interval s.days_for_spend day, now()) as days_left, s.minimum_spend
+
+from user_card_lookup l
+inner join user on user_id = user.id
+inner join card on card.id = l.card_id
+inner join company on company.id = card.company_id
+inner join signup_bonus s on s.card_id = card.id and l.active_date between s.from_date and s.to_date and s.minimum_spend > 0
+
+where user.active = 1
+and card.active = 1
+and l.active = 1
+and l.status = 'active'
+and now() between l.active_date and l.active_date + interval s.days_for_spend day;
+and mod(datediff(now(),l.active_date), 30) = 0;
+    """
+
+    users = db.session.execute(get_users_query)
+
+    return users
+
+
 
 def send_min_spend_email():
 
-    users = models.User.query.filter_by(active=1, admin=1).all()
+    users = get_min_spend_users()
 
-    subject = "Hello {} Welcome to CrdTrckr"
+    messages = []
 
-    body = """Hey guys,
+    for user in users:
 
-    Welcome to the CrdTrckr.  Lots of exciting things going on.  You guys were the first to sign up so I've made you all admins.  You can go to www.crdtrckr.com and log in with your created user name.
+        subject = "Make sure you reach the min spend on your {} card".format(user[4])
 
-    Then you'll be able to see the admin page in the upper right hand corner.  This will take you to a secret place.  A place where you can manage all the cards, signup bonuses, and all the rewards and spending categories associated with each.
+        body = """Hey {},
 
-    This is going to be the tricky part, is keeping this up-to-date.  In order to be able to suggest cards, we need this information.  So I'm hopefully that you guys can help me out in gathering it.
+        
 
-    If you have any questions, please email me at rpputt@hotmail.com.
+        """
 
-    Thanks
+        msg = Message(recipients=[user[1]]
+                      subject=subject,
+                      body=body)
 
-    -Ray
-    """
+        messages.append(msg)
 
-    msg = Message(subject=subject,body=body)
+    send_email(messages)
 
-    send_email(users, msg)
+# get_min_spend_users()

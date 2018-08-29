@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, FileField, RadioField, HiddenField, DateField
 from wtforms.validators import DataRequired, Email, ValidationError, EqualTo
-from app.models import User, Company, Card, PointsProgram, RewardCategory, SpendingCategory
+from app import db, models
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -18,12 +18,12 @@ class SignupForm(FlaskForm):
     submit = SubmitField('Sign In')
 
     def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
+        user = models.User.query.filter_by(username=username.data).first()
         if user is not None:
             raise ValidationError('Please use a different UserName')
 
     def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
+        user = models.User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Please use a different Email')
 
@@ -51,13 +51,13 @@ class PointsProgramForm(FlaskForm):
     name = StringField('Program Name')
 
 class RewardCategoryForm(FlaskForm):
-    name = StringField('Reward Category Name')
+    reward_program_id = SelectField('Rewards Program Name')
 
-class ProgramRewardCategoryForm(FlaskForm):
-    points_program_id = HiddenField('Program Name')
-    reward_category_id = SelectField('Reward Category Name')
+class RewardProgramForm(FlaskForm):
+    category_name = SelectField('Reward Category Name')
+    program_name = StringField('Reward Program Name')
     company_name = StringField('Reward Company Name')
-    redeem_value = StringField('Point Value')
+    redeem_value = StringField('Point Value ($)')
 
 class SpendingCategoryForm(FlaskForm):
     name = StringField('Spending Category Name')

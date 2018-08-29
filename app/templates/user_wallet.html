@@ -23,6 +23,7 @@
 
 <div class="content">
   <h1>Welcome {{user.username}} this is your wallet</h1>
+  <form action="" method="post">
   <div id="accordion">
     <div>
       <button type="button" class="button accordion-title is-outlined is-fullwidth">
@@ -50,7 +51,6 @@
     </div>
     <span>
       <br />
-      <form action="" method="post">
       {% for card in cards['active'] %}
         <div class="level">
           <span class="level-left"><h5 class="level-item title is-5">{{card.company.name}} - {{card.name}}</h5></span>
@@ -60,7 +60,6 @@
           </span>
     </div>
     {% endfor %}
-    </form>
     <br />
     </span>
     <div>
@@ -72,7 +71,6 @@
     </div>
     <span>
       <br />
-      <form action="" method="post">
       {% for card in cards['suggested'] %}
         <div class="level">
           <span class="level-left"><h5 class="level-item title is-5">{{card.company.name}} - {{card.name}}</h5></span>
@@ -82,7 +80,6 @@
       </span>
     </div>
     {% endfor %}
-    </form>
     <br />
     </span>
     <div>
@@ -113,17 +110,16 @@
       </div>
       <span>
         <br />
-              <form action="" method="post">
         {% for card in cards['inactive'] %}
         <div class="level">
           <span class="level-left"><h5 class="level-item title is-5">{{card.company.name}} - {{card.name}}</h5></span>
           <span class="level-right">
             <button class="level-item button is-small is-info" type="button" onClick="window.open('{{url_for('card_profile',card_id=card.id)}}', '_blank')">Card Details</button>
-            <button class="level-item button is-small is-success is-outlined" type="submit" name="apply" value="{{card.id}}" onClick="window.open('{{card.apply_link_url}}', '_blank')">Apply For Card</button> </span>
+            <button class="level-item button is-small is-success is-outlined" type="submit" name="apply" value="{{card.id}}" onClick="window.open('{{card.apply_link_url}}', '_blank')">Reapply For Card</button> </span>
     </div>
     {% endfor %}
       <br />
-      </form>
+  </form>
       </span>
       <div>
       </div>

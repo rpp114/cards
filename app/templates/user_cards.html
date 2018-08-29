@@ -2,6 +2,23 @@
 <script>
 
 $(document).ready(function() {
+    $('#accordion').accordion({
+      collapsible: true,
+      animate: 100
+    });
+
+    $('.ui-accordion-header-active > button').removeClass('is-outlined').addClass('is-primary');
+
+    $('.accordion-title').on('click', function() {
+
+      if ($(this).hasClass('is-primary')) {
+        $(this).addClass('is-outlined').removeClass('is-primary');
+      } else {
+        $('.accordion-title').addClass('is-outlined').removeClass('is-primary');
+        $(this).removeClass('is-outlined').addClass('is-primary');
+      };
+    });
+
   $('.date_input').datepicker();
 });
 
@@ -66,53 +83,44 @@ function close_modal(){
 </div>
 
 <div class="content">
-  <h1>Hello {{ current_user.username}}, here's your first Card:</h1>
-  <div class="level">
-    <div class="level-left">
-      <div class="level-item">
-        <h4>{{suggested_card.company.name}}</h4>
+ <h3>Here are other available cards NOT in your wallet</h3>
+ <div id="accordion">
+  {% for company in cards['companies'] %}
+    <div>
+      <button type="button" class="button accordion-title is-outlined is-fullwidth">
+      <span>{{company}}</span>
+      <span class="icon">
+        <i class="fa fa-angle-down" aria-hidden="true"></i>
+      </span>
+    </div>
+    <span>
+      {% for type in cards[company] %}
+      {% if cards[company][type]|length > 0 %}
+      <h3>{{type.capitalize()}}</h3>
+        {%for card in cards[company][type]%}
+          <div class="level">
+              <div class="level-left" id="card_name" onmouseover="console.log('this is moused over')">
+                  <div class="level-item">
+                      <h6 class=''>{{card.name}}</h6>
+                  </div>
+              </div>
+              <div class="level-right">
+                  <div class="level-item">
+                      <button class="button is-info is-small wallet" onclick="show_modal({'name':'{{card.name}}', 'id':'{{card.id}}'})" type="button" name="card_id" value="{{card.id}}">Add to Wallet</button>
+                  </div>
+                  <div class="level-item">
+                      <button class="button is-light is-small" onClick="location.href='/card/profile?card_id={{card.id}}'" type="button">Card Details</button>
+                  </div>
+                  <div class="level-item">
+                      <button class="button is-success is-small" type="button">Apply For Card</button>
+                  </div>
+              </div>
       </div>
-      <div class="level-item">
-        <h4>{{suggested_card.name}}</h4>
-      </div>
-    </div>
-    <div class="level-right">
-      <div class="level-item">
-        <button class="button is-info  is-small" type="button" name="card_id" onclick="show_modal({'name': '{{suggested_card.name}}', 'id':'{{suggested_card.id}}'})">Add to Wallet</button>
-      </div>
-      <div class="level-item">
-        <button class="button is-light is-small" onClick="location.href='/card?card_id={{suggested_card.id}}'" type="button">Card Details</button>
-      </div>
-      <div class="level-item">
-        <button class="button is-success is-small" type="button">Apply For Card</button>
-      </div>
-    </div>
-  </div>
-  <h3>Here's all the other ones you could get:</h3>
-  {% for card in cards %}
-  {% if card not in user_cards %}
-    <div class="level">
-        <div class="level-left" id="card_name" onmouseover="console.log('this is moused over')">
-          <div class="level-item">
-          <h6 class=''>{{card.company.name}}</h6>
-        </div>
-          <div class="level-item">
-          <h6 class=''>{{card.name}}</h6>
-        </div>
-    </div>
-    <div class="level-right">
-      <div class="level-item">
-      <button class="button is-info is-small wallet" onclick="show_modal({'name':'{{card.name}}', 'id':'{{card.id}}'})" type="button" name="card_id" value="{{card.id}}">Add to Wallet</button>
-    </div>
-    <div class="level-item">
-      <button class="button is-light is-small" onClick="location.href='/card?card_id={{card.id}}'" type="button">Card Details</button>
-    </div>
-    <div class="level-item">
-      <button class="button is-success is-small" type="button">Apply For Card</button>
-    </div>
-    </div>
-  </div>
-  {% endif %}
-  {% endfor %}
+      {%endfor%}
+      {%endif%}
+      {%endfor%}
+  </span>
+  {%endfor%}
 </div>
+
 {% endblock %}

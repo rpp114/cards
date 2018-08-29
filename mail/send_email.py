@@ -14,23 +14,12 @@ sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
 from app import db, models, mail, app
 
 
-def send_mail(users, message):
+def send_mail(messages):
 
-    for user in users:
+    with app.app_context():
+        with mail.connect() as conn:
 
-        recipient = [user.email]
-
-        message['recipients'] = recipient
-
-        message['subject'] = message['subject'].format(user.username)
-
-        with app.app_context():
-            with mail.connect() as conn:
-
-                msg = Message(recipients=message['recipients'],
-                              subject=message['subject'],
-                              body=message['body'])
-
+            for msg in messages:
                 conn.send(msg)
 
 
