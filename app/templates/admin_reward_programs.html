@@ -1,0 +1,65 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+<script>
+  $(document).ready(function() {
+    $('#accordion').accordion({
+      collapsible: true,
+      animate: 100
+    });
+
+    $('.ui-accordion-header-active > button').removeClass('is-outlined').addClass('is-primary');
+
+    $('.accordion-title').on('click', function() {
+
+      if ($(this).hasClass('is-primary')) {
+        $(this).addClass('is-outlined').removeClass('is-primary');
+      } else {
+        $('.accordion-title').addClass('is-outlined').removeClass('is-primary');
+        $(this).removeClass('is-outlined').addClass('is-primary');
+      };
+    });
+  })
+</script>
+
+
+  <div class="content">
+    <div class="level">
+      <div class="level-left">
+        <span class="level-item"><h1>Reward Programs</h1></span>
+        <span class="level-item"><button class="button is-primary is-small" type="button" onClick="location.href='{{url_for('admin_reward_program')}}'">Add New Program</button></span>
+      </div>
+    </div>
+    <span id='form_span'></span>
+    <div id="accordion">
+    {% for category in programs['categories'] %}
+      <div>
+        <button type="button" class="button accordion-title is-outlined is-fullwidth">
+        <span>{{category}}</span>
+        <span class="icon">
+          <i class="fa fa-angle-down" aria-hidden="true"></i>
+        </span>
+      </div>
+      <span>
+        <br />
+        {% for program in programs[category] %}
+        <div class="level">
+            <span class="level-left">
+                <div class="level-item">
+                    <p>{{program.program_name}}</p>
+                </div>
+            </span>
+            <span class="level-right">
+                <div class="level-item">
+                    <button class="button is-primary is-small" type="button" onClick="location.href='{{url_for('admin_reward_program', reward_program_id=program.id)}}'">Edit Program</button>
+                </div>
+            </span>
+        </div>
+        {% endfor %}
+        <br />
+    </span>
+    {% endfor %}
+  </div>
+
+
+{% endblock %}
