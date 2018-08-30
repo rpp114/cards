@@ -14,8 +14,6 @@ def send_admin_email():
 
     users = models.User.query.filter_by(active=1).all()
 
-    subject = "Hello {} From to CrdTrckr".format(user.username)
-
     body = """Hey guys,
 
     Hello from CrdTrckr.  More exciting things going on.
@@ -43,9 +41,15 @@ def send_admin_email():
     """
 
     messages = []
+
     for user in users:
-        message = {'recipients':[user.email],
+        subject = "Hello {} From to CrdTrckr".format(user.username)
+        message = {'recipient':[user.email],
                    'subject':subject,
                    'body':body}
+        messages.append(message)
+
 
     send_email.send_mail(messages)
+
+send_admin_email()
