@@ -23,7 +23,6 @@ and card.active = 1
 and l.active = 1
 and l.status = 'active'
 and now() between l.active_date and l.active_date + interval s.days_for_spend day
-and user.email = 'rpputt@hotmail.com'
 and mod(datediff(now(),l.active_date), 30) = 0;
     """
 
