@@ -1,7 +1,7 @@
 import datetime, os
 from flask import render_template, flash, url_for, redirect, request
 from app import app, db, models
-from app.forms import LoginForm, CardForm, SignupForm, CompanyForm, SignupBonusForm,PointsProgramForm, RewardCategoryForm, RewardProgramForm,SpendingCategoryForm,CardSpendingCategoryForm,UserCardForm
+from app.forms import LoginForm, CardForm, SignupForm, CompanyForm, SignupBonusForm,PointsProgramForm, RewardCategoryForm, RewardProgramForm,SpendingCategoryForm,CardSpendingCategoryForm,UserCardForm, PasswordChangeForm
 from flask_login import current_user, login_user, login_required, logout_user
 from werkzeug.utils import secure_filename
 
@@ -48,6 +48,31 @@ def signup():
 		return redirect(url_for('user_wallet'))
 
 	return render_template('signup.html', form=form)
+
+
+@app.route('/user/password', methods=['GET', 'POST'])
+def change_password():
+	form = PasswordChangeForm()
+
+	# Need to display error for not matching passwords.
+	# for field, errors in form.errors:
+	# 	print(field, errors)
+
+	if form.validate_on_submit():
+		user = current_user
+		user.set_password(form.password.data)
+		user.set_session_token()
+		db.session.add(user)
+		db.session.commit()
+
+		login_user(user)
+
+		flash('Password Changed!')
+
+		return redirect(url_for('user_wallet'))
+
+
+	return render_template('password_change.html', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -100,7 +125,7 @@ def user_wallet():
 			user_card_lookup.status = 'active'
 
 			message = 'Added {} to your wallet.'
-			
+
 		elif request.form.get('apply'):
 			card_id = request.form.get('apply')
 			user_card_lookup = models.UserCardLookup.query.filter_by(card_id=card_id, user_id = current_user.id).first()

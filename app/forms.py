@@ -9,11 +9,15 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
 
+class PasswordChangeForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired(), EqualTo('password2',message="Please make the passwords match!")])
+    password2 = PasswordField('Password Confirm', validators=[DataRequired()])
+
 class SignupForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    password2 = PasswordField('Password Confirm', validators=[DataRequired(), EqualTo('password')])
+    password = PasswordField('Password', validators=[DataRequired(), EqualTo('password2',message="Please make the passwords match!")])
+    password2 = PasswordField('Password Confirm', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
 
