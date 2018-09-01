@@ -10,5 +10,4 @@ from admin_alert import send_admin_email
 from annual_fee_alert import send_annual_fee_email
 
 
-
 send_annual_fee_email()
