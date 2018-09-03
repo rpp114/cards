@@ -21,6 +21,7 @@ class User(UserMixin, db.Model):
     first_login = db.Column(db.BOOLEAN(), default=1)
     admin = db.Column(db.BOOLEAN(), default=0)
     cards = db.relationship('Card', secondary='user_card_lookup')
+    preferences = db.relationship('UserPreference', backref='user', lazy='dynamic')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -37,6 +38,19 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
+class UserPreference(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    active = db.Column(db.BOOLEAN, default=1)
+    from_date = db.Column(db.DATETIME, default=datetime.datetime(1,1,1,0,0,0))
+    to_date = db.Column(db.DATETIME, default=datetime.datetime(9999,12,31,23,59,59))
+    own_company = db.Column(db.BOOLEAN(), default=0)
+    reward_category_1 = db.Column(db.VARCHAR(50))
+    reward_company_1 = db.Column(db.VARCHAR(50))
+    reward_category_2 = db.Column(db.VARCHAR(50))
+    reward_company_2 = db.Column(db.VARCHAR(50))
+    reward_category_3 = db.Column(db.VARCHAR(50))
+    reward_company_3 = db.Column(db.VARCHAR(50))
 
 ####################################################
 #  Card and Company Definitions -- User Join to Cards

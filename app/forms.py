@@ -31,6 +31,15 @@ class SignupForm(FlaskForm):
         if user is not None:
             raise ValidationError('Please use a different Email')
 
+class PreferenceForm(FlaskForm):
+    own_company = BooleanField('I can apply for Corporate Cards?')
+    reward_category_1 = SelectField('First Preference: Reward Category')
+    reward_company_1 = SelectField('First Preference: Reward Company')
+    reward_category_2 = SelectField('Second Preference: Reward Category')
+    reward_company_2 = SelectField('Second Preference: Reward Company')
+    reward_category_3 = SelectField('Third Preference: Reward Category')
+    reward_company_3 = SelectField('Third Preference: Reward Company')
+
 class CardForm(FlaskForm):
     company_id = HiddenField('Company Name')
     name = StringField('Card Name', validators=[DataRequired()])

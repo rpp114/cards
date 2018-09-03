@@ -1,21 +1,69 @@
 {% extends "external_base.html" %}
 
 {% block content %}
-  <h1>Sign In</h1>
-  <form action="" method="post" novalidate>
-    {{ form.hidden_tag() }}
-      <p>
-        {{ form.username.label }}</br>
-        {{ form.username(size=32) }}
-      </p>
-      <p>
-        {{ form.password.label }}</br>
-        {{ form.password(size=32) }}
-      </p>
-      <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-      <p>{{ form.submit() }}</p>
-  </form>
-  <p>
-    Not a Member? <a href="{{ url_for('signup') }}">Sign Up Here</a>
-  </p>
+      <div class="columns is-centered">
+        <article class="card is-rounded">
+          <div class="card-content">
+            <span class="columns is-centered is-mobile">
+                    <h1 class="title">
+                  <img src="/static/img/ct_logo.png" alt="CrdTrckr" width="150">
+                </h1>
+                     </span>
+            <form action="/login" method="post">
+              {{ form.hidden_tag() }}
+              <div class="field">
+                <div class="field-body">
+                  <div class="field">
+                    <p class="control has-icons-left">
+                      {{ form.username(placeholder="Username", class="input is-medium") }}
+                      <span class="icon is-left">
+                          <i class="fa fa-user"></i>
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="field">
+                <div class="field-body">
+                  <div class="field">
+                    <p class="control has-icons-left">
+                      {{ form.password(placeholder="Password", class="input is-medium") }}
+                      <span class="icon is-left">
+                <i class="fa fa-lock"></i>
+              </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="field">
+                <div class="field-body">
+                  <div class="field">
+                    <p class="control">
+                      <input type="checkbox">
+                      <label class="checkbox">
+                        Remember me
+                      </label>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="field">
+                <div class="field-body">
+                  <div class="field">
+                    <p class="control">
+                      <button class="button is-primary is-medium is-fullwidth">
+                    Login
+                  </button>
+                    </p>
+                    <p>
+                      Not a Member? <a href="{{ url_for('signup') }}">Sign Up Here</a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </article>
+      </div>
+
+
 {% endblock %}

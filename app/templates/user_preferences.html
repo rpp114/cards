@@ -1,0 +1,120 @@
+{% extends "internal_base.html" %} {% block content %}
+<script>
+    $(document).ready(function() {
+        var cats = {{categories | tojson | safe}};
+
+        $(".category").change(function() {
+            var cat = this.value;
+            var cat_num = this.id.split('_')[1]
+            var comp_num = "company_" + cat_num
+            var company_select = document.getElementById(comp_num)
+
+            company_select.options.length = 1;
+            if (cat != 'None') {
+                var name_list = cats[cat];
+                for (i = 0; i < name_list.length; i++) {
+                    var opt = document.createElement('option');
+                    opt.value = name_list[i]
+                    opt.text = name_list[i]
+                    company_select.add(opt)
+                }
+            }
+
+        })
+
+    });
+</script>
+
+<div class="content">
+
+    <form action="" method="post">
+        {{form.hidden_tag()}}
+        <div class="level">
+            <div class="field is-horizontal level-left">
+                <div class="field-label level-item">
+                    <label class="label">{{form.own_company.label}}</label>
+                </div>
+                <div class="field-body level-item">
+                    <div class="control">
+                        {{form.own_company}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="level">
+            <div class="field is-horizontal level-left">
+                <div class="field-label level-item">
+                    <label class="label">{{form.reward_category_1.label}}</label>
+                </div>
+                <div class="field-body level-item">
+                    <div class="control select">
+                        {{form.reward_category_1(class="category", id="category_1")}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="level">
+            <div class="field is-horizontal level-left">
+                <div class="field-label level-item">
+                    <label class="label">{{form.reward_company_1.label}}</label>
+                </div>
+                <div class="field-body level-item">
+                    <div class="control select">
+                        {{form.reward_company_1(id="company_1")}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="level">
+            <div class="field is-horizontal level-left">
+                <div class="field-label level-item">
+                    <label class="label">{{form.reward_category_2.label}}</label>
+                </div>
+                <div class="field-body level-item">
+                    <div class="control select">
+                        {{form.reward_category_2(class="category", id="category_2")}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="level">
+            <div class="field is-horizontal level-left">
+                <div class="field-label level-item">
+                    <label class="label">{{form.reward_company_2.label}}</label>
+                </div>
+                <div class="field-body level-item">
+                    <div class="control select">
+                        {{form.reward_company_2(id="company_2")}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="level">
+            <div class="field is-horizontal level-left">
+                <div class="field-label level-item">
+                    <label class="label">{{form.reward_category_3.label}}</label>
+                </div>
+                <div class="field-body level-item">
+                    <div class="control select">
+                        {{form.reward_category_3(class="category", id="category_3")}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="level">
+            <div class="field is-horizontal level-left">
+                <div class="field-label level-item">
+                    <label class="label">{{form.reward_company_3.label}}</label>
+                </div>
+                <div class="field-body level-item">
+                    <div class="control select">
+                        {{form.reward_company_3(id="company_3")}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="button is-primary" type="submit">Submit</button>
+    </form>
+
+</div>
+{% endblock %}

@@ -1,7 +1,8 @@
-import datetime, os
+import datetime, os, json
 from flask import render_template, flash, url_for, redirect, request
 from app import app, db, models
-from app.forms import LoginForm, CardForm, SignupForm, CompanyForm, SignupBonusForm,PointsProgramForm, RewardCategoryForm, RewardProgramForm,SpendingCategoryForm,CardSpendingCategoryForm,UserCardForm, PasswordChangeForm
+from app.forms import LoginForm, CardForm, SignupForm, CompanyForm, SignupBonusForm,PointsProgramForm, RewardCategoryForm, RewardProgramForm,SpendingCategoryForm,\
+	CardSpendingCategoryForm,UserCardForm, PasswordChangeForm, PreferenceForm
 from flask_login import current_user, login_user, login_required, logout_user
 from werkzeug.utils import secure_filename
 
@@ -39,13 +40,14 @@ def signup():
 		user = models.User(username=form.username.data, email=form.email.data, active=1)
 		user.set_password(form.password.data)
 		user.set_session_token()
+		user.first_login = 0
 
 		db.session.add(user)
 		db.session.commit()
 
 		login_user(user, remember=form.remember_me.data)
 
-		return redirect(url_for('user_wallet'))
+		return redirect(url_for('user_preferences'))
 
 	return render_template('signup.html', form=form)
 
@@ -70,7 +72,6 @@ def change_password():
 		flash('Password Changed!')
 
 		return redirect(url_for('user_wallet'))
-
 
 	return render_template('password_change.html', form=form)
 
@@ -100,6 +101,76 @@ def login():
 ##############################################################
 # Users Views
 ##############################################################
+
+@app.route('/user/preferences', methods=['GET', 'POST'])
+@login_required
+def user_preferences():
+
+	prefs_list = current_user.preferences.order_by(models.UserPreference.to_date).all()
+	if len(prefs_list) > 0:
+		prefs=prefs_list[-1]
+		form = PreferenceForm(obj=prefs)
+	else:
+		prefs = None
+		form = PreferenceForm()
+
+	if request.method == 'POST':
+		data = request.form
+
+		if prefs:
+			now = datetime.datetime.now()
+			prefs.active = 0
+			prefs.to_date = now
+			db.session.add(prefs)
+			new_prefs = models.UserPreference(from_date = now)
+		else:
+			new_prefs = models.UserPreference()
+
+
+		new_prefs.own_company = 1 if data.get('own_company', '') == 'y' else 0
+		new_prefs.user_id = current_user.id
+
+		for x in range(1,4):
+			cat = 'reward_category_' + str(x)
+			comp = 'reward_company_' + str(x)
+			setattr(new_prefs, cat, data.get(cat, 'None'))
+			setattr(new_prefs, comp, data.get(comp, 'None'))
+
+		db.session.add(new_prefs)
+		db.session.commit()
+
+		flash('Updated Reward Preferences')
+
+		return redirect(url_for('user_wallet'))
+
+
+	reward_categories = models.RewardProgram.query.filter_by(active=True).order_by(models.RewardProgram.category_name, models.RewardProgram.company_name).all()
+
+	categories = {}
+	companies = []
+
+	for c in reward_categories:
+		categories[c.category_name] = categories.get(c.category_name, [])
+		categories[c.category_name].append(c.company_name)
+		companies.append((c.company_name, c.company_name))
+
+
+	form.reward_category_1.choices = [('None', 'None')] + [(c,c) for c in categories.keys()]
+	form.reward_category_2.choices = [('None', 'None')] + [(c,c) for c in categories.keys()]
+	form.reward_category_3.choices = [('None', 'None')] + [(c,c) for c in categories.keys()]
+
+	if prefs:
+		form.reward_company_1.choices = [('All', 'All')] + [(c,c) for c in categories[prefs.reward_category_1]]
+		form.reward_company_2.choices = [('All', 'All')] + [(c,c) for c in categories[prefs.reward_category_2]]
+		form.reward_company_3.choices = [('All', 'All')] + [(c,c) for c in categories[prefs.reward_category_3]]
+	else:
+		form.reward_company_1.choices = [('All', 'All')]
+		form.reward_company_2.choices = [('All', 'All')]
+		form.reward_company_3.choices = [('All', 'All')]
+
+
+	return render_template('user_preferences.html', form=form, categories=categories)
+
 
 @app.route('/user/wallet', methods=['GET', 'POST'])
 @login_required
