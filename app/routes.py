@@ -177,6 +177,7 @@ def user_preferences():
 def user_wallet():
 
 	if request.method == 'POST':
+		print(request.form)
 
 		if request.form.get('remove'):
 			card_id = request.form.get('remove')
@@ -193,6 +194,8 @@ def user_wallet():
 			if not user_card_lookup:
 				user_card_lookup = models.UserCardLookup(card_id=card_id, user_id=current_user.id)
 			user_card_lookup.active = 1
+			user_card_lookup.active_date = datetime.datetime.strptime(request.form.get('activation_date'),'%m/%d/%Y')
+			user_card_lookup.expiration_date = datetime.datetime.strptime(request.form.get('expiration_date'),'%m/%d/%Y')
 			user_card_lookup.status = 'active'
 
 			message = 'Added {} to your wallet.'
@@ -231,11 +234,23 @@ def user_wallet():
 
 	return render_template('user_wallet.html',user=current_user, cards=cards, wallet=wallet)
 
-@app.route('/user/card')
+@app.route('/user/card', methods=['GET', 'POST'])
 @login_required
 def user_card():
+	card_id = request.args.get('card_id', '')
 
-	return render_template('user_profile.html')
+	user_card_lookup = models.UserCardLookup.query.filter_by(card_id=card_id, user_id=current_user.id).first()
+
+	form = UserCardForm() if user_card_lookup == None else UserCardForm(obj=user_card_lookup)
+
+	if request.method == 'POST':
+		user_card_lookup.active_date = form.active_date.data
+		print(form.cancel_date.data)
+		# print(datetime.datetime.strptime(form.active_date.data,'%Y-%m-%d'))
+
+	return render_template('user_card.html',
+							form=form,
+							user_card=user_card_lookup)
 
 @app.route('/user/profile')
 @login_required
@@ -257,10 +272,10 @@ def search_cards():
 			user_card.expiration_date = datetime.datetime.strptime(request.form.get('expiration_date'),'%m/%d/%Y')
 		db.session.add(user_card)
 		db.session.commit()
-		card = models.Card.query.get(request.form.get('card_id'))
+		card = user_card.cards
 		flash('Added {} to your wallet'.format(card.name))
 
-	all_cards = models.Card.query.all()
+	all_cards = models.Card.query.filter(models.Card.active == 1, models.Card.company.has(active=1)).all()
 
 	cards = {'companies': []}
 
@@ -274,8 +289,29 @@ def search_cards():
 
 	cards['companies'] = sorted(cards['companies'], key=lambda x:x.lower())
 
-	return render_template('user_cards.html', cards=cards)
+	return render_template('cards.html', cards=cards)
 
+@app.route('/search/points_programs', methods=['GET', 'POST'])
+@login_required
+def search_points():
+	if request.method == 'POST':
+		print('posted')
+
+
+	all_points = models.PointsProgram.query.filter(models.PointsProgram.active == 1).order_by(models.PointsProgram.name).all()
+
+	programs = {'programs': []}
+
+	for program in all_points:
+		if program.name not in programs['programs']:
+			programs['programs'].append(program.name)
+		programs[program.name] = programs.get(program.name, {'rewards':[], 'cards':[]})
+
+		programs[program.name]['cards'] = program.cards.join(models.SignupBonus).with_entities(models.Card.id, models.Card.name, models.SignupBonus.bonus_points, models.SignupBonus.minimum_spend).filter(models.SignupBonus.active == 1, models.Card.active == 1).order_by(models.SignupBonus.bonus_points.desc()).all()
+		programs[program.name]['rewards'] = program.reward_programs.order_by(models.RewardProgram.program_name).all()
+
+
+	return render_template('points_programs.html', programs = programs)
 
 ##############################################################
 # Card Views

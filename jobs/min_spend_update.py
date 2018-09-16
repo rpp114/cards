@@ -67,7 +67,7 @@ Thanks
                       'body':body}
 
         messages.append(msg)
-
+    print(messages)
     send_mail(messages)
 
 # send_min_spend_email()

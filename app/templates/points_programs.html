@@ -1,13 +1,19 @@
 {% extends "internal_base.html" %} {% block content %}
+<style>
+.accordion-toggle {cursor:pointer;}
+.accordion-content {display:none;}
+.accordion-content.default {display:block;}
+</style>
+
 <script>
 
 $(document).ready(function() {
-    $('#accordion').accordion({
-      collapsible: true,
-      animate: 100
-    });
+    $('#accordion').find('.accordion-toggle').click(function(){
 
-    $('.ui-accordion-header-active > button').removeClass('is-outlined').addClass('is-primary');
+        $(this).next().slideToggle('fast');
+
+        $('.accordion-content').not($(this).next()).slideUp('fast');
+    })
 
     $('.accordion-title').on('click', function() {
 
@@ -83,42 +89,47 @@ function close_modal(){
 </div>
 
 <div class="content">
- <h3>Here are other available cards NOT in your wallet</h3>
+ <h3>Here are All Available Points Programs</h3>
  <div id="accordion">
-  {% for company in cards['companies'] %}
-    <div>
+  {% for program in programs['programs'] %}
+    <div class="accordion-toggle">
       <button type="button" class="button accordion-title is-outlined is-fullwidth">
-      <span>{{company}}</span>
+      <span>{{program}}</span>
       <span class="icon">
         <i class="fa fa-angle-down" aria-hidden="true"></i>
       </span>
     </div>
-    <span>
-      {% for type in cards[company] %}
-      {% if cards[company][type]|length > 0 %}
-      <h3>{{type.capitalize()}}</h3>
-        {%for card in cards[company][type]%}
-          <div class="level">
-              <div class="level-left" id="card_name" onmouseover="console.log('this is moused over')">
-                  <div class="level-item">
-                      <h6 class=''>{{card.name}}</h6>
-                  </div>
-              </div>
-              <div class="level-right">
-                  <div class="level-item">
-                      <button class="button is-info is-small wallet" onclick="show_modal({'name':'{{card.name}}', 'id':'{{card.id}}'})" type="button" name="card_id" value="{{card.id}}">Add to Wallet</button>
-                  </div>
-                  <div class="level-item">
-                      <button class="button is-light is-small" onClick="location.href='/card/profile?card_id={{card.id}}'" type="button">Card Details</button>
-                  </div>
-                  <div class="level-item">
-                      <button class="button is-success is-small" type="button">Apply For Card</button>
-                  </div>
-              </div>
-      </div>
+    <span class="accordion-content">
+        <h4>Reward Programs</h4>
+            <table class="table">
+                <tr><th>Program</th><th>Company</th><th>Value</th><th></th></tr>
+            {% for reward in programs[program]['rewards'] %}
+            <tr>
+                <td>{{reward.program_name}}</td>
+                <td>{{reward.company_name}}</td>
+                <td>{{"${:.3f}".format(reward.redeem_value)}}</td>
+                <td><button class="button is-info is-small wallet" {#onclick="show_modal({'name':'{{card.name}}', 'id':'{{card.id}}'})"#} type="button">Reward Program Info</button>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+      <h3>Cards</h3>
+      <table class="table">
+        <tr><th>Card Name</th><th>Sign Up Bonus</th><th>Minimum Spend</th><th></th></tr>
+        {%for card in programs[program]['cards']%}
+          <tr>
+              <td>{{card.name}}</td>
+              <td>{{"{:,}".format(card.bonus_points)}}</td>
+              <td>{{"${:,}".format(card.minimum_spend)}}</td>
+              <td>
+                  <button class="button is-info is-small wallet" onclick="show_modal({'name':'{{card.name}}', 'id':'{{card.id}}'})" type="button" name="card_id" value="{{card.id}}">Add to Wallet</button>
+                  <button class="button is-light is-small" onClick="location.href='/card/profile?card_id={{card.id}}'" type="button">Card Details</button>
+                  <button class="button is-success is-small" type="button">Apply For Card</button>
+              </td>
       {%endfor%}
-      {%endif%}
-      {%endfor%}
+  </table>
+
   </span>
   {%endfor%}
 </div>

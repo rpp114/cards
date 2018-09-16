@@ -1,0 +1,132 @@
+{% extends "internal_base.html" %} {% block content %}
+<style>
+.accordion-toggle {cursor:pointer;}
+.accordion-content {display:none;}
+.accordion-content.default {display:block;}
+</style>
+
+<script>
+
+$(document).ready(function() {
+    $('#accordion').find('.accordion-toggle').click(function(){
+
+        $(this).next().slideToggle('fast');
+
+        $('.accordion-content').not($(this).next()).slideUp('fast');
+    })
+
+    $('.accordion-title').on('click', function() {
+
+      if ($(this).hasClass('is-primary')) {
+        $(this).addClass('is-outlined').removeClass('is-primary');
+      } else {
+        $('.accordion-title').addClass('is-outlined').removeClass('is-primary');
+        $(this).removeClass('is-outlined').addClass('is-primary');
+      };
+    });
+
+  $('.date_input').datepicker();
+});
+
+function show_modal(card){
+  document.getElementById('modal_card_name').innerHTML = card.name;
+  document.getElementById('card_id_input').value = card.id;
+  document.getElementById('modal').classList.add('is-active');
+};
+
+function close_modal(){
+  document.getElementById('modal').classList.remove('is-active');
+};
+</script>
+
+<div class="modal" id="modal">
+  <div class="modal-background" onClick="close_modal()"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title" id="modal_card_name"></p>
+    </header>
+    <section class="modal-card-body">
+      <form action="" method="post" name="wallet_cards">
+        <input type="hidden" id="card_id_input" value="" name="card_id" />
+        <div class="field is-horizontal">
+          <span class="field-label">
+            <label class="label">Activation Date:</label>
+          </span>
+        <div class="field-body">
+        <div class="control">
+          <input type="text" class="date_input" name="activation_date" />
+        </div>
+      </div>
+      </div>
+        <div class="field is-horizontal">
+          <span class="field-label">
+            <label class="label">Expiration Date:</label>
+          </span>
+        <div class="field-body is-right">
+        <div class="control">
+          <input type="text" class="date_input" name="expiration_date" />
+        </div>
+      </div>
+      </div>
+    </section>
+    <footer class="modal-card-foot">
+      <span class="level">
+        <div class="level-left">
+        <div class="level-item">
+
+        <button class="button is-success is-small" type="submit">Add to Wallet</button>
+      </div>
+      </div>
+        <div class="level-right">
+        <div class="level-item">
+          <button class="button is-light is-small" id="cancel_button" type="button" onClick="close_modal()">Cancel</button>
+      </div>
+      </div>
+      </span>
+    </footer>
+    </form>
+  </div>
+</div>
+
+<div class="content">
+ <h3>Here are All available cards by Company</h3>
+ <div id="accordion">
+  {% for company in cards['companies'] %}
+    <div class="accordion-toggle">
+      <button type="button" class="button accordion-title is-outlined is-fullwidth">
+      <span>{{company}}</span>
+      <span class="icon">
+        <i class="fa fa-angle-down" aria-hidden="true"></i>
+      </span>
+    </div>
+    <span class="accordion-content">
+      {% for type in cards[company] %}
+      {% if cards[company][type]|length > 0 %}
+      <h3>{{type.capitalize()}}</h3>
+        {%for card in cards[company][type]%}
+          <div class="level">
+              <div class="level-left" id="card_name" onmouseover="console.log('this is moused over')">
+                  <div class="level-item">
+                      <h6 class=''>{{card.name}}</h6>
+                  </div>
+              </div>
+              <div class="level-right">
+                  <div class="level-item">
+                      <button class="button is-info is-small wallet" onclick="show_modal({'name':'{{card.name}}', 'id':'{{card.id}}'})" type="button" name="card_id" value="{{card.id}}">Add to Wallet</button>
+                  </div>
+                  <div class="level-item">
+                      <button class="button is-light is-small" onClick="location.href='/card/profile?card_id={{card.id}}'" type="button">Card Details</button>
+                  </div>
+                  <div class="level-item">
+                      <button class="button is-success is-small" type="button">Apply For Card</button>
+                  </div>
+              </div>
+      </div>
+      {%endfor%}
+      {%endif%}
+      {%endfor%}
+  </span>
+  {%endfor%}
+</div>
+
+{% endblock %}

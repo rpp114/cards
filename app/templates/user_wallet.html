@@ -1,13 +1,15 @@
 {% extends "internal_base.html" %} {% block content %}
 
 <script>
-  $(document).ready(function() {
-    $('#accordion').accordion({
-      collapsible: true,
-      animate: 100
-    });
+$(document).ready(function() {
+    $('#accordion').find('.accordion-toggle').click(function(){
 
-    $('.ui-accordion-header-active > button').removeClass('is-outlined').addClass('is-primary');
+        $(this).next().slideToggle('fast');
+
+        $('.accordion-content').not($(this).next()).slideUp('fast');
+    })
+
+    $('.default').find('button').removeClass('is-outlined').addClass('is-primary');
 
     $('.accordion-title').on('click', function() {
 
@@ -18,21 +20,89 @@
         $(this).removeClass('is-outlined').addClass('is-primary');
       };
     });
-  })
+})
+
+
+function show_modal(card){
+  $('.date_input').datepicker();
+  document.getElementById('modal_card_name').innerHTML = card.name;
+  document.getElementById('card_id_input').value = card.id;
+  document.getElementById('modal').classList.add('is-active');
+};
+
+function close_modal(){
+  document.getElementById('modal').classList.remove('is-active');
+};
+
 </script>
+<style>
+.accordion-toggle {cursor:pointer;}
+.accordion-content {display:none;}
+.accordion-content.default {display:block;}
+</style>
+
 
 <div class="content">
   <h1>Welcome {{user.username}} this is your wallet</h1>
   <form action="" method="post">
+      <div class="modal" id="modal">
+        <div class="modal-background" onClick="close_modal()"></div>
+        <div class="modal-card">
+          <header class="modal-card-head">
+            <p class="modal-card-title" id="modal_card_name"></p>
+          </header>
+          <section class="modal-card-body">
+            <form action="" method="post" name="wallet_cards">
+              <input type="hidden" id="card_id_input" value="" name="add" />
+              <div class="field is-horizontal">
+                <span class="field-label">
+                  <label class="label">Activation Date:</label>
+                </span>
+              <div class="field-body">
+              <div class="control">
+                <input type="text" class="date_input" name="activation_date" />
+              </div>
+            </div>
+            </div>
+              <div class="field is-horizontal">
+                <span class="field-label">
+                  <label class="label">Expiration Date:</label>
+                </span>
+              <div class="field-body is-right">
+              <div class="control">
+                <input type="text" class="date_input" name="expiration_date" />
+              </div>
+            </div>
+            </div>
+          </section>
+          <footer class="modal-card-foot">
+            <span class="level">
+              <div class="level-left">
+              <div class="level-item">
+
+              <button class="button is-success is-small" type="submit">Add to Wallet</button>
+            </div>
+            </div>
+              <div class="level-right">
+              <div class="level-item">
+                <button class="button is-light is-small" id="cancel_button" type="button" onClick="close_modal()">Cancel</button>
+            </div>
+            </div>
+            </span>
+          </footer>
+          </form>
+        </div>
+      </div>
+
   <div id="accordion">
-    <div>
-      <button type="button" class="button accordion-title is-outlined is-fullwidth">
+    <div class="accordion-toggle default">
+      <button type="button" class="button is-outlined is-fullwidth accordion-title">
       <span>Optimized Wallet:</span>
       <span class="icon">
         <i class="fa fa-angle-down" aria-hidden="true"></i>
       </span>
     </div>
-    <span>
+    <span class="accordion-content default">
       <br />
       <h3>Spot for Optimized wallet based on User active Cards</h3>
     {#
@@ -42,79 +112,82 @@
     #}
       <br />
     </span>
-    <div>
-      <button type="button" class="button accordion-title is-outlined is-fullwidth">
+    <div class="accordion-toggle">
+      <button type="button" class="button is-outlined is-fullwidth accordion-title">
       <span>Current Cards ({{cards['active']|length}}):</span>
       <span class="icon">
         <i class="fa fa-angle-down" aria-hidden="true"></i>
       </span>
     </div>
-    <span>
+    <span class="accordion-content">
       <br />
       {% for card in cards['active'] %}
         <div class="level">
           <span class="level-left"><h5 class="level-item title is-5">{{card.company.name}} - {{card.name}}</h5></span>
           <span class="level-right">
-              <button class="level-item button is-small is-info" type="submit" name="apply" value="{{card.id}}" onClick="window.open('{{url_for('user_card', card_id=card.id)}}', '_blank')">Edit Card Info</button>
+            <button class="level-item button is-small is-info" type="button" onClick="window.open('{{url_for('user_card', card_id=card.id)}}', '_blank')">Edit Card Info</button>
+            <button class="level-item button is-small is-light" type="button" onClick="window.open('{{url_for('card_profile',card_id=card.id)}}', '_blank')">Card Details</button>
             <button class="level-item button is-small is-danger is-outlined" type="submit" name="remove" value="{{card.id}}">Remove</button>
           </span>
     </div>
     {% endfor %}
     <br />
     </span>
-    <div>
-      <button type="button" class="button accordion-title is-outlined is-fullwidth">
+{#    <div class="accordion-toggle">
+      <button type="button" class="button is-outlined is-fullwidth accordion-title">
       <span>Suggested Cards ({{cards['suggested']|length}}):</span>
       <span class="icon">
         <i class="fa fa-angle-down" aria-hidden="true"></i>
       </span>
     </div>
-    <span>
+    <span class="accordion-content">
       <br />
       {% for card in cards['suggested'] %}
         <div class="level">
           <span class="level-left"><h5 class="level-item title is-5">{{card.company.name}} - {{card.name}}</h5></span>
           <span class="level-right">
-      <button class="level-item button is-small is-info" type="button" onClick="window.open('{{url_for('card_profile',card_id=card.id)}}', '_blank')">Card Details</button>
+      <button class="level-item button is-small is-light" type="button" onClick="window.open('{{url_for('card_profile',card_id=card.id)}}', '_blank')">Card Details</button>
       <button class="level-item button is-small is-success is-outlined" type="submit" name="apply" value="{{card.id}}" onClick="window.open('{{card.apply_link_url}}', '_blank')">Apply For Card</button>
       </span>
     </div>
     {% endfor %}
     <br />
     </span>
-    <div>
-      <button type="button" class="button accordion-title is-outlined is-fullwidth">
+    #}
+    <div class="accordion-toggle">
+      <button type="button" class="button is-outlined is-fullwidth accordion-title">
       <span>Applied for Cards ({{cards['applied']|length}}):</span>
       <span class="icon">
         <i class="fa fa-angle-down" aria-hidden="true"></i>
       </span>
     </div>
-    <span>
+    <span class="accordion-content">
       <br />
       {% for card in cards['applied'] %}
         <div class="level">
           <span class="level-left"><h5 class="level-item title is-5">{{card.company.name}} - {{card.name}}</h5></span>
           <span class="level-right">
-            <button class="level-item button is-small is-success" type="submit" name="add" value="{{card.id}}">Add To Wallet</button>
+            <button class="level-item button is-small is-light" type="button" onClick="window.open('{{url_for('card_profile',card_id=card.id)}}', '_blank')">Card Details</button>
+            <button class="level-item button is-small is-success" type="button" name="add" value="{{card.id}}" onclick="show_modal({'name':'{{card.name}}', 'id':'{{card.id}}'})" >Add To Wallet</button>
       </span>
     </div>
     {% endfor %}
     <br />
     </span>
-    <div>
-      <button type="button" class="button accordion-title is-outlined is-fullwidth">
+    <div class="accordion-toggle">
+      <button type="button" class="button is-outlined is-fullwidth accordion-title">
         <span>Cancelled Cards ({{cards['inactive']|length}}):</span>
         <span class="icon">
           <i class="fa fa-angle-down" aria-hidden="true"></i>
         </span>
       </div>
-      <span>
+      <span class="accordion-content">
         <br />
         {% for card in cards['inactive'] %}
         <div class="level">
           <span class="level-left"><h5 class="level-item title is-5">{{card.company.name}} - {{card.name}}</h5></span>
           <span class="level-right">
-            <button class="level-item button is-small is-info" type="button" onClick="window.open('{{url_for('card_profile',card_id=card.id)}}', '_blank')">Card Details</button>
+            <button class="level-item button is-small is-light" type="button" onClick="window.open('{{url_for('card_profile',card_id=card.id)}}', '_blank')">Card Details</button>
             <button class="level-item button is-small is-success is-outlined" type="submit" name="apply" value="{{card.id}}" onClick="window.open('{{card.apply_link_url}}', '_blank')">Reapply For Card</button> </span>
     </div>
     {% endfor %}

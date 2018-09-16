@@ -20,9 +20,9 @@
       Cards
     </div>
       <div class="navbar-dropdown">
-        <a class="navbar-item" href="{{url_for('search_cards')}}">Search Cards</a>
-        <a class="navbar-item" href="">Points Programs</a>
-        <a class="navbar-item" href="">Rewards Programs</a>
+        <a class="navbar-item" href="{{url_for('search_cards')}}">by Company</a>
+        <a class="navbar-item" href="{{url_for('search_points')}}">by Points Program</a>
+        <a class="navbar-item" href="">by Rewards Program</a>
       </div>
     </div>
     <div class="navbar-item has-dropdown is-hoverable">
@@ -31,7 +31,8 @@
     </div>
       <div class="navbar-dropdown">
           <a class="navbar-item" href="{{ url_for('user_profile') }}">Profile</a>
-        <a class="navbar-item" href="">Notifications</a>
+        <a class="navbar-item" href="{{ url_for('user_preferences') }}">Reward Preferences</a>
+        <a class="navbar-item" href="">Email Notifications</a>
         <a class="navbar-item" href="">Submitted Suggestions</a>
       </div>
     </div>

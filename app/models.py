@@ -88,8 +88,8 @@ class UserCardLookup(db.Model):
     cancel_date = db.Column(db.DATETIME)
     active = db.Column(db.BOOLEAN(), default=1)
     status = db.Column(db.VARCHAR(10), default='active')
-    user_cards = db.relationship('User', backref=db.backref('user_cards', cascade='all, delete-orphan'))
-    card_users = db.relationship('Card', backref=db.backref('card_users', cascade='all, delete-orphan'))
+    users = db.relationship('User', backref=db.backref('user_cards', cascade='all, delete-orphan'))
+    cards = db.relationship('Card', backref=db.backref('card_users', cascade='all, delete-orphan'))
 
 ####################################################
 #  Points Programs and Sign Up Bonuses
@@ -101,7 +101,7 @@ class PointsProgram(db.Model):
     active = db.Column(db.BOOLEAN(), default=1)
     ulu = db.Column(db.VARCHAR(50))
     cards = db.relationship('Card', backref='points_program', lazy='dynamic')
-    reward_programs = db.relationship('RewardProgram', backref='points_program', secondary='reward_program_lookup')
+    reward_programs = db.relationship('RewardProgram', backref='points_program', secondary='reward_program_lookup', lazy="dynamic")
 
 
 class SignupBonus(db.Model):
