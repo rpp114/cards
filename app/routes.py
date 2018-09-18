@@ -290,8 +290,10 @@ def search_cards():
 
 	cards = {'companies': []}
 
+	user_card_ids = [card.id for card in current_user.cards.all()]
+
 	for card in all_cards:
-		if card in current_user.cards:
+		if card[1] in user_card_ids:
 			continue
 		if card.company_name not in cards['companies']:
 			cards['companies'].append(card.company_name)
