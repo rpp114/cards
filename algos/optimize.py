@@ -94,9 +94,9 @@ def suggest_cards(user):
     }
 
     query = """
-select id, sum(potential)
+select id, max(potential)
 from (
-select distinct card.id, bonus.bonus_points * rp.redeem_value * 3 as potential
+select card.id, max(bonus.bonus_points * rp.redeem_value * 3) as potential
 
 from company
 inner join card on card.company_id = company.id and card.active = 1 and company.active = 1
@@ -106,10 +106,11 @@ inner join reward_program_lookup rpl on rpl.points_program_id = pp.id and rpl.ac
 inner join reward_program rp on rp.id = rpl.reward_program_id and rp.active = 1
 
 where  1 = 1 {w[company]} {w[cat_1]}
+group by 1
 
 union
 
-select distinct card.id, bonus.bonus_points * rp.redeem_value * 2 as potential
+select card.id, max(bonus.bonus_points * rp.redeem_value * 2) as potential
 
 from company
 inner join card on card.company_id = company.id and card.active = 1 and company.active = 1
@@ -119,10 +120,11 @@ inner join reward_program_lookup rpl on rpl.points_program_id = pp.id and rpl.ac
 inner join reward_program rp on rp.id = rpl.reward_program_id and rp.active = 1
 
 where  1 = 1 {w[company]} {w[cat_2]}
+group by 1
 
 union
 
-select distinct card.id, bonus.bonus_points * rp.redeem_value * 1 as potential
+select card.id, max(bonus.bonus_points * rp.redeem_value * 1) as potential
 
 from company
 inner join card on card.company_id = company.id and card.active = 1 and company.active = 1
@@ -131,7 +133,8 @@ inner join points_program pp on pp.id = card.points_program_id and pp.active = 1
 inner join reward_program_lookup rpl on rpl.points_program_id = pp.id and rpl.active = 1
 inner join reward_program rp on rp.id = rpl.reward_program_id and rp.active = 1
 
-where  1 = 1 {w[company]} {w[cat_3]}) cards
+where  1 = 1 {w[company]} {w[cat_3]}
+group by 1) cards
 
 group by 1
 
