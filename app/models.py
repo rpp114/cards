@@ -20,7 +20,7 @@ class User(UserMixin, db.Model):
     active = db.Column(db.BOOLEAN(), default=1)
     first_login = db.Column(db.BOOLEAN(), default=1)
     admin = db.Column(db.BOOLEAN(), default=0)
-    cards = db.relationship('Card', secondary='user_card_lookup')
+    cards = db.relationship('Card', secondary='user_card_lookup', lazy='dynamic')
     preferences = db.relationship('UserPreference', backref='user', lazy='dynamic')
 
     def __repr__(self):
@@ -76,7 +76,7 @@ class Card(db.Model):
     ulu = db.Column(db.VARCHAR(50))
     users = db.relationship('User', backref='card', secondary='user_card_lookup')
     signup_bonuses = db.relationship('SignupBonus', backref='card', lazy='dynamic')
-    spending_categories = db.relationship('SpendingCategory', backref='card', secondary='spending_category_lookup')
+    spending_categories = db.relationship('SpendingCategory', backref='card', secondary='spending_category_lookup', lazy='dynamic')
 
 
 class UserCardLookup(db.Model):

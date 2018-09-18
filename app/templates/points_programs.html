@@ -94,7 +94,7 @@ function close_modal(){
   {% for program in programs['programs'] %}
     <div class="accordion-toggle">
       <button type="button" class="button accordion-title is-outlined is-fullwidth">
-      <span>{{program}}</span>
+      <span>{{program}} ({{programs[program]['cards']|length}} cards)</span>
       <span class="icon">
         <i class="fa fa-angle-down" aria-hidden="true"></i>
       </span>

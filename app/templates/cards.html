@@ -94,7 +94,7 @@ function close_modal(){
   {% for company in cards['companies'] %}
     <div class="accordion-toggle">
       <button type="button" class="button accordion-title is-outlined is-fullwidth">
-      <span>{{company}}</span>
+      <span>{{company}} ({{cards[company].get('business',[])|length + cards[company].get('personal',[])|length}} cards)</span>
       <span class="icon">
         <i class="fa fa-angle-down" aria-hidden="true"></i>
       </span>
@@ -103,26 +103,21 @@ function close_modal(){
       {% for type in cards[company] %}
       {% if cards[company][type]|length > 0 %}
       <h3>{{type.capitalize()}}</h3>
+      <table class="table">
+        <tr><th>Card Name</th><th>Sign Up Bonus</th><th>Minimum Spend</th><th></th></tr>
         {%for card in cards[company][type]%}
-          <div class="level">
-              <div class="level-left" id="card_name" onmouseover="console.log('this is moused over')">
-                  <div class="level-item">
-                      <h6 class=''>{{card.name}}</h6>
-                  </div>
-              </div>
-              <div class="level-right">
-                  <div class="level-item">
-                      <button class="button is-info is-small wallet" onclick="show_modal({'name':'{{card.name}}', 'id':'{{card.id}}'})" type="button" name="card_id" value="{{card.id}}">Add to Wallet</button>
-                  </div>
-                  <div class="level-item">
-                      <button class="button is-light is-small" onClick="location.href='/card/profile?card_id={{card.id}}'" type="button">Card Details</button>
-                  </div>
-                  <div class="level-item">
-                      <button class="button is-success is-small" type="button">Apply For Card</button>
-                  </div>
-              </div>
-      </div>
-      {%endfor%}
+          <tr>
+              <td>{{card.name}}</td>
+              <td>{{"{:,}".format(card.bonus_points)}}</td>
+              <td>{{"${:,}".format(card.minimum_spend)}}</td>
+              <td>
+                  <button class="button is-info is-small wallet" onclick="show_modal({'name':'{{card.name}}', 'id':'{{card.id}}'})" type="button" name="card_id" value="{{card.id}}">Add to Wallet</button>
+                  <button class="button is-light is-small" onClick="location.href='/card/profile?card_id={{card.id}}'" type="button">Card Details</button>
+                  <button class="button is-success is-small" type="button">Apply For Card</button>
+              </td>
+          {%endfor%}
+      </table>
+
       {%endif%}
       {%endfor%}
   </span>

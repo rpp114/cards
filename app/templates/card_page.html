@@ -4,17 +4,31 @@
 <div class="content">
 
   <h1>{{card.name}}</h1>
-  <p>Card Type: {{card.card_type|title}}</p>
-  <p>Points Program: {{card.points_program.name}}</p>
-  <h3>Sign Up Bonus</h3>
-  <p>Points: {{reward.bonus_points}}</p>
-  <p>Min Spend: {{reward.minimum_spend}}</p>
-  <p>Days to Min Spend: {{reward.days_for_spend}}</p>
+  <table class="table">
+  <tr><td>Card Type</td><td>{{card.card_type|title}}</td></tr>
+  <tr><td>Points Program</td><td>{{card.points_program.name}}</td></tr>
+</table>
+  <h3>Current Sign Up Bonus</h3>
+  <table class="table">
+  <tr><td>Points</td><td>{{'{:,}'.format(reward.bonus_points)}}</td></tr>
+  <tr><td>Minimum Spend</td><td>{{'${:,}'.format(reward.minimum_spend)}}</td></tr>
+  <tr><td>Days To Min Spend</td><td>{{reward.days_for_spend}}</td></tr>
+</table>
   <h3>Spending Categories</h3>
+  <table class="table">
+    <tr>
+        <th>Category</th>
+        <th>Company</th>
+        <th>Earning Percent</th>
+    </tr>
   {% for category in spending_categories %}
-    <p>{{category[0]}} - {{category[1]}}</p>
-
+  <tr>
+      <td>{{category.name}}</td>
+      <td>{{category.company_name}}</td>
+      <td>{{category.earning_percent}}</td>
+  </tr>
   {% endfor %}
+</table>
   <h3>Comments</h3>
 </div>
 {% endblock %}

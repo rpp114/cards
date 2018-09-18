@@ -2,12 +2,14 @@
 
 <script>
 $(document).ready(function() {
+
     $('#accordion').find('.accordion-toggle').click(function(){
 
         $(this).next().slideToggle('fast');
 
         $('.accordion-content').not($(this).next()).slideUp('fast');
-    })
+    });
+
 
     $('.default').find('button').removeClass('is-outlined').addClass('is-primary');
 
@@ -39,6 +41,8 @@ function close_modal(){
 .accordion-toggle {cursor:pointer;}
 .accordion-content {display:none;}
 .accordion-content.default {display:block;}
+.wallet-accordion-toggle {cursor:pointer;}
+.wallet-accordion-content {display:none;}
 </style>
 
 
@@ -104,17 +108,33 @@ function close_modal(){
     </div>
     <span class="accordion-content default">
       <br />
-      <h3>Spot for Optimized wallet based on User active Cards</h3>
-    {#
+      {% if cards['active']|length == 0 %}
+      <h3>Add some cards to your wallet to get optimized spending categories</h3>
+      {% else %}
       {% for category in wallet %}
-          <h5><a href="{{ url_for('card_profile', card_id=card.id) }}">{{card.company.name}} - {{card.name}}</a></h5>
+
+      {% if wallet[category]|length >0 %}
+     <h5 class="title is-5 is-bold">{{category}}</h5>
+          <table class="table">
+              <tr><th>Company</th><th>Card Name</th><th>Earnings</th></tr>
+              {% for card in wallet[category] %}
+                <tr>
+                    <td>{{card[1]}}</td>
+                    <td>{{card[3]}}</td>
+                    <td>{{'{:}%'.format(card[4]*100)}}</td>
+                </tr>
+                {% endfor %}
+          </table>
+
+          {% endif %}
       {% endfor %}
-    #}
+
+      {% endif %}
       <br />
     </span>
     <div class="accordion-toggle">
       <button type="button" class="button is-outlined is-fullwidth accordion-title">
-      <span>Current Cards ({{cards['active']|length}}):</span>
+      <span>Current Cards ({{cards['active']|length}} cards):</span>
       <span class="icon">
         <i class="fa fa-angle-down" aria-hidden="true"></i>
       </span>
@@ -133,9 +153,9 @@ function close_modal(){
     {% endfor %}
     <br />
     </span>
-{#    <div class="accordion-toggle">
+ <div class="accordion-toggle">
       <button type="button" class="button is-outlined is-fullwidth accordion-title">
-      <span>Suggested Cards ({{cards['suggested']|length}}):</span>
+      <span>Suggested Cards ({{cards['suggested']|length}} cards):</span>
       <span class="icon">
         <i class="fa fa-angle-down" aria-hidden="true"></i>
       </span>
@@ -153,10 +173,10 @@ function close_modal(){
     {% endfor %}
     <br />
     </span>
-    #}
+
     <div class="accordion-toggle">
       <button type="button" class="button is-outlined is-fullwidth accordion-title">
-      <span>Applied for Cards ({{cards['applied']|length}}):</span>
+      <span>Applied for Cards ({{cards['applied']|length}} cards):</span>
       <span class="icon">
         <i class="fa fa-angle-down" aria-hidden="true"></i>
       </span>
@@ -176,7 +196,7 @@ function close_modal(){
     </span>
     <div class="accordion-toggle">
       <button type="button" class="button is-outlined is-fullwidth accordion-title">
-        <span>Cancelled Cards ({{cards['inactive']|length}}):</span>
+        <span>Cancelled Cards ({{cards['inactive']|length}} cards):</span>
         <span class="icon">
           <i class="fa fa-angle-down" aria-hidden="true"></i>
         </span>

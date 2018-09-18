@@ -6,6 +6,9 @@ from app.forms import LoginForm, CardForm, SignupForm, CompanyForm, SignupBonusF
 from flask_login import current_user, login_user, login_required, logout_user
 from werkzeug.utils import secure_filename
 
+from algos.optimize import suggest_cards, get_wallet
+
+
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.',1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
@@ -177,7 +180,7 @@ def user_preferences():
 def user_wallet():
 
 	if request.method == 'POST':
-		print(request.form)
+		# print(request.form)
 
 		if request.form.get('remove'):
 			card_id = request.form.get('remove')
@@ -228,11 +231,14 @@ def user_wallet():
 		cards[user_card[3]] = cards.get(user_card[3], [])
 		cards[user_card[3]].append(user_card[0])
 
-	# cards['suggested'] = cards['active']
+	cards['suggested'] = [models.Card.query.get(id) for id in suggest_cards(current_user)]
 
-	wallet = {'travel':[]}
+	wallet = get_wallet(current_user)
 
-	return render_template('user_wallet.html',user=current_user, cards=cards, wallet=wallet)
+	return render_template('user_wallet.html',
+		user=current_user,
+		cards=cards,
+		wallet=wallet)
 
 @app.route('/user/card', methods=['GET', 'POST'])
 @login_required
@@ -275,17 +281,20 @@ def search_cards():
 		card = user_card.cards
 		flash('Added {} to your wallet'.format(card.name))
 
-	all_cards = models.Card.query.filter(models.Card.active == 1, models.Card.company.has(active=1)).all()
+	all_cards = models.Card.query.join(models.SignupBonus).join(models.Company)\
+	.with_entities(models.Company.name.label('company_name'), models.Card.id, models.Card.card_type, models.Card.name, models.SignupBonus.bonus_points, models.SignupBonus.minimum_spend)\
+	.filter(models.SignupBonus.active == 1, models.Card.active == 1, models.Card.company.has(active=1))\
+	.order_by(models.Company.name, models.SignupBonus.bonus_points.desc(),models.SignupBonus.minimum_spend, models.Card.name).all()
 
 	cards = {'companies': []}
 
 	for card in all_cards:
 		if card in current_user.cards:
 			continue
-		if card.company.name not in cards['companies']:
-			cards['companies'].append(card.company.name)
-		cards[card.company.name] = cards.get(card.company.name, {'business':[],'personal':[]})
-		cards[card.company.name][card.card_type].append(card)
+		if card.company_name not in cards['companies']:
+			cards['companies'].append(card.company_name)
+		cards[card.company_name] = cards.get(card.company_name, {'business':[],'personal':[]})
+		cards[card.company_name][card.card_type].append(card)
 
 	cards['companies'] = sorted(cards['companies'], key=lambda x:x.lower())
 
@@ -324,10 +333,10 @@ def card_profile():
 
 	card = models.Card.query.get(card_id)
 
-	spending_categories = []
-
-	for i in range(len(card.spending_categories)):
-		spending_categories.append((card.spending_categories[i].name, card.card_spending_categories[0].earning_percent))
+	spending_categories = card.spending_categories.join(models.SpendingCategoryLookup)\
+		.with_entities(models.SpendingCategory.name, models.SpendingCategoryLookup.company_name, models.SpendingCategoryLookup.earning_percent)\
+		.filter(models.SpendingCategory.active == 1, models.SpendingCategoryLookup.active == 1)\
+		.order_by(models.SpendingCategory.name, models.SpendingCategoryLookup.company_name).all()
 
 	reward = card.signup_bonuses.filter_by(active=1).first()
 
@@ -632,8 +641,6 @@ def admin_reward_programs():
 			programs['categories'].append(rp.category_name)
 		programs[rp.category_name] = programs.get(rp.category_name, [])
 		programs[rp.category_name].append(rp)
-
-
 
 
 	return render_template('admin_reward_programs.html', programs=programs)
