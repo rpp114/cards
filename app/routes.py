@@ -314,13 +314,16 @@ def search_points():
 	all_points = models.PointsProgram.query.filter(models.PointsProgram.active == 1).order_by(models.PointsProgram.name).all()
 
 	programs = {'programs': []}
+	user_card_ids = [card.id for card in current_user.cards.all()]
 
 	for program in all_points:
 		if program.name not in programs['programs']:
 			programs['programs'].append(program.name)
 		programs[program.name] = programs.get(program.name, {'rewards':[], 'cards':[]})
 
-		programs[program.name]['cards'] = program.cards.join(models.SignupBonus).with_entities(models.Card.id, models.Card.name, models.SignupBonus.bonus_points, models.SignupBonus.minimum_spend).filter(models.SignupBonus.active == 1, models.Card.active == 1).order_by(models.SignupBonus.bonus_points.desc()).all()
+		programs[program.name]['cards'] = program.cards.join(models.SignupBonus)\
+		.with_entities(models.Card.id, models.Card.name, models.SignupBonus.bonus_points, models.SignupBonus.minimum_spend)\
+		.filter(~models.Card.id.in_(user_card_ids),models.SignupBonus.active == 1, models.Card.active == 1).order_by(models.SignupBonus.bonus_points.desc()).all()
 		programs[program.name]['rewards'] = program.reward_programs.order_by(models.RewardProgram.program_name).all()
 
 
