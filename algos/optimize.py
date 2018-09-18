@@ -71,6 +71,9 @@ order by 1, 4 desc""".format(user.id)
         if used_card[0] in all_cards_list:
             wallet['All Else'] = [all_cards[all_cards_list.index(used_card[0])]]
 
+    if not wallet.get('All Else', None) and all_cards:
+        wallet['All Else'] = [all_cards[0]]
+
     return wallet
 
 
