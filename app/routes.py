@@ -158,14 +158,14 @@ def user_preferences():
 		companies.append((c.company_name, c.company_name))
 
 
-	form.reward_category_1.choices = [('None', 'None')] + [(c,c) for c in categories.keys()]
-	form.reward_category_2.choices = [('None', 'None')] + [(c,c) for c in categories.keys()]
-	form.reward_category_3.choices = [('None', 'None')] + [(c,c) for c in categories.keys()]
+	form.reward_category_1.choices = [('None', 'None')] + [(c,c) for c in sorted(categories.keys())]
+	form.reward_category_2.choices = [('None', 'None')] + [(c,c) for c in sorted(categories.keys())]
+	form.reward_category_3.choices = [('None', 'None')] + [(c,c) for c in sorted(categories.keys())]
 
 	if prefs:
-		form.reward_company_1.choices = [('All', 'All')] + [(c,c) for c in categories[prefs.reward_category_1]]
-		form.reward_company_2.choices = [('All', 'All')] + [(c,c) for c in categories[prefs.reward_category_2]]
-		form.reward_company_3.choices = [('All', 'All')] + [(c,c) for c in categories[prefs.reward_category_3]]
+		form.reward_company_1.choices = [('All', 'All')] + [(c,c) for c in sorted(categories[prefs.reward_category_1])]
+		form.reward_company_2.choices = [('All', 'All')] + [(c,c) for c in sorted(categories[prefs.reward_category_2])]
+		form.reward_company_3.choices = [('All', 'All')] + [(c,c) for c in sorted(categories[prefs.reward_category_3])]
 	else:
 		form.reward_company_1.choices = [('All', 'All')]
 		form.reward_company_2.choices = [('All', 'All')]
