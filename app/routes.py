@@ -281,6 +281,8 @@ def search_cards():
 		card = user_card.cards
 		flash('Added {} to your wallet'.format(card.name))
 
+		return redirect(url_for('user_wallet'))
+
 	all_cards = models.Card.query.join(models.SignupBonus).join(models.Company)\
 	.with_entities(models.Company.name.label('company_name'), models.Card.id, models.Card.card_type, models.Card.name, models.SignupBonus.bonus_points, models.SignupBonus.minimum_spend)\
 	.filter(models.SignupBonus.active == 1, models.Card.active == 1, models.Card.company.has(active=1))\
