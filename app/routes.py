@@ -260,7 +260,7 @@ def user_card():
 
 		return redirect(url_for('user_wallet'))
 
-	if form.active_date.data != '':
+	if form.active_date.data != None:
 		form.active_date.data = form.active_date.data.strftime('%m/%d/%Y')
 
 	if form.expiration_date.data != None:
@@ -363,6 +363,17 @@ def card_profile():
 	reward = card.signup_bonuses.filter_by(active=1).first()
 
 	return render_template('card_page.html',card=card, reward=reward, spending_categories = spending_categories)
+
+##############################################################
+# Suggestions
+##############################################################
+
+
+@app.route('/suggestion', methods=['POST'])
+@login_required
+def suggestion():
+	print(request.form)
+
 
 
 ##############################################################
@@ -834,8 +845,3 @@ def admin_points_program():
 	reward_programs = models.RewardProgram.query.order_by(models.RewardProgram.program_name).all()
 
 	return render_template('admin_points_program.html', form=form, program=program, reward_programs=reward_programs)
-
-@app.route('/suggestion', methods=['POST'])
-@login_required
-def suggestion():
-	print(request.form)
