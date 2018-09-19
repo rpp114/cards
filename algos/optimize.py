@@ -79,6 +79,10 @@ order by 1, 4 desc""".format(user.id)
 
 def suggest_cards(user):
 
+    ###########################################################################
+    # Needs to add 5/24 logic to the cards
+    ###########################################################################
+
     prefs = user.preferences.filter(models.UserPreference.active == 1).first()
 
     current_card_ids = [c.id for c in user.cards.join(models.UserCardLookup).filter(models.UserCardLookup.status == 'active').all()]

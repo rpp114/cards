@@ -8,13 +8,17 @@
   <tr><td>Card Type</td><td>{{card.card_type|title}}</td></tr>
   <tr><td>Points Program</td><td>{{card.points_program.name}}</td></tr>
 </table>
-  <h3>Current Sign Up Bonus</h3>
+  <h3 class="title is-4">Current Sign Up Bonus</h3>
+  <h5 class="subtitle is-5">Found By: {{reward.ulu}}</h5>
   <table class="table">
   <tr><td>Points</td><td>{{'{:,}'.format(reward.bonus_points)}}</td></tr>
   <tr><td>Minimum Spend</td><td>{{'${:,}'.format(reward.minimum_spend)}}</td></tr>
   <tr><td>Days To Min Spend</td><td>{{reward.days_for_spend}}</td></tr>
+  <tr><td>Annual Fee</td><td>{{'${:,}'.format(reward.annual_fee)}}</td></tr>
+  <tr><td>Annual Fee Waived First Year</td><td>{{reward.annual_fee_waived}}</td></tr>
 </table>
-  <h3>Spending Categories</h3>
+    {#<button class="button is-small suggest_signup" type="button" onclick="show_suggestion_modal({{card.id}}, {{current_user.id}})">Suggest New Bonus</button>#}
+  <h3 class="title is-4">Spending Categories</h3>
   <table class="table">
     <tr>
         <th>Category</th>
@@ -25,7 +29,7 @@
   <tr>
       <td>{{category.name}}</td>
       <td>{{category.company_name}}</td>
-      <td>{{category.earning_percent}}</td>
+      <td>{{'{:}%'.format(category.earning_percent*100)}}</td>
   </tr>
   {% endfor %}
 </table>

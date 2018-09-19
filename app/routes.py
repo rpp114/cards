@@ -250,9 +250,24 @@ def user_card():
 	form = UserCardForm() if user_card_lookup == None else UserCardForm(obj=user_card_lookup)
 
 	if request.method == 'POST':
-		user_card_lookup.active_date = form.active_date.data
-		print(form.cancel_date.data)
-		# print(datetime.datetime.strptime(form.active_date.data,'%Y-%m-%d'))
+
+		user_card_lookup.active_date = None if not request.form.get('active_date', None) else datetime.datetime.strptime(request.form.get('active_date'),'%m/%d/%Y')
+		user_card_lookup.expiration_date = None if not request.form.get('expiration_date', None) else datetime.datetime.strptime(request.form.get('expiration_date'),'%m/%d/%Y')
+		user_card_lookup.cancel_date = None if not request.form.get('cancel_date', None) else datetime.datetime.strptime(request.form.get('cancel_date'),'%m/%d/%Y')
+
+		db.session.add(user_card_lookup)
+		db.session.commit()
+
+		return redirect(url_for('user_wallet'))
+
+	if form.active_date.data != '':
+		form.active_date.data = form.active_date.data.strftime('%m/%d/%Y')
+
+	if form.expiration_date.data != None:
+		form.expiration_date.data = form.expiration_date.data.strftime('%m/%d/%Y')
+
+	if form.cancel_date.data != None:
+		form.cancel_date.data = form.cancel_date.data.strftime('%m/%d/%Y')
 
 	return render_template('user_card.html',
 							form=form,
@@ -819,3 +834,8 @@ def admin_points_program():
 	reward_programs = models.RewardProgram.query.order_by(models.RewardProgram.program_name).all()
 
 	return render_template('admin_points_program.html', form=form, program=program, reward_programs=reward_programs)
+
+@app.route('/suggestion', methods=['POST'])
+@login_required
+def suggestion():
+	print(request.form)

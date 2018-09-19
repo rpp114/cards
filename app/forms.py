@@ -84,6 +84,6 @@ class CardSpendingCategoryForm(FlaskForm):
 class UserCardForm(FlaskForm):
     card_id = HiddenField()
     user_id = HiddenField()
-    active_date = DateField('Activation Date')
-    expiration_date = DateField('Expiration Date')
-    cancel_date = DateField('Cancel Date')
+    active_date = StringField('Activation Date')
+    expiration_date = StringField('Expiration Date')
+    cancel_date = StringField('Cancel Date')
